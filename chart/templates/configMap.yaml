@@ -1,0 +1,16 @@
+{{- range $name, $val := .Values.configMap }}
+{{ if $val.create -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $.Values.labels.app }}
+  namespace: {{ $.Values.namespace }}
+{{- with $val.data }}
+data:
+{{- toYaml . | nindent 2 -}}
+{{- end -}}
+{{- end -}}
+{{ end -}}

@@ -1,0 +1,19 @@
+# output
+dist
+out
+.webpack
+
+# dependencies
+node_modules
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/install-state.gz
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.idea
+.vscode

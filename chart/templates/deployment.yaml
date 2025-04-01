@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "chart.labels" . | nindent 8 }}
+        {{- range $key, $val := .Values.labels }}
+        {{ $key }}: {{ $val | quote }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      {{- range $name, $val := .Values.containers }}
+        - name: {{ $name }}
+          securityContext:
+            {{- toYaml $val.securityContext | nindent 12 }}
+          image: "{{ $val.image.repository }}:{{ $val.image.tag }}"
+          imagePullPolicy: {{ $val.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $val.containerPort }}
+              protocol: TCP
+          {{- if $val.livenessProbe -}}
+          livenessProbe:
+            {{- toYaml $val.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if $val.readinessProbe -}}
+          readinessProbe:
+            {{- toYaml $val.readinessProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml $val.resources | nindent 12 }}
+          {{- if $val.env -}}
+          {{- with $val.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if $val.envFrom -}}
+          {{- with $val.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if $val.volumeMounts -}}
+          {{- with $val.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if $val.lifecycle }}
+          {{- with $val.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
+      {{ end -}}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
