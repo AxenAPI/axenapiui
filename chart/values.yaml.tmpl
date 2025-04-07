@@ -1,0 +1,116 @@
+# Default values for chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: {{ REPLICAS_COUNT }}
+
+namespace: {{ PROJECT }}
+
+labels:
+  project: {{ PROJECT }}
+  app: {{ DC_NAME }}
+  deploymentconfig: {{ DC_NAME }}
+  commit: '{{ COMMIT_TAG | string }}'
+
+imagePullSecrets: [
+  name: regcred
+]
+nameOverride: ""
+fullnameOverride: {{ DC_NAME }}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: {{ SA }}
+  automount: true
+
+podAnnotations:
+  openshift.io/prometheus: 'true'
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+services:
+  {{ DC_NAME }}:
+    type: ClusterIP
+    port: 8080
+    targetPort: 80
+    protocol: TCP
+
+ingress:
+  enabled: true
+  annotations:
+    meta.helm.sh/release-name: {{ DC_NAME }}
+    meta.helm.sh/release-namespace: {{ PROJECT }}
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: {{ DC_NAME }}.{{ PROJECT }}.{{ ROUTER_PREFIX }}
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: {{ TLS_SECRET_NAME | default(DC_NAME + '-tls') }}
+      hosts:
+        - {{ DC_NAME }}.{{ PROJECT }}.{{ ROUTER_PREFIX }}
+  targetPort: 8080
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+containers:
+  {{ DC_NAME }}:
+    securityContext: {}
+    image:
+      repository: {{ IMAGE_REGISTRY }}/{{ IMAGE_NAME }}
+      pullPolicy: Always
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: {{ VERSION }}
+    containerPort: 80
+    resources:
+      limits:
+        cpu: {{ CPU_LIMIT }}
+        memory: {{ MEMORY_LIMIT }}
+      requests:
+        cpu: {{ CPU_REQUEST }}
+        memory: {{ MEMORY_REQUEST }}
+    env:
+      - name: POD_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
+      - name: NAMESPACE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+      - name: PROXY_ADDRESS_FORWARDING
+        value: 'true'
+      - name: TZ
+        value: {{ TZ }}
+
+deployment:
+  volumes: {}
+
+configMap:
+  {{ DC_NAME }}:
+    create: false
+    data: {}
+
+secrets:
+  {{ DC_NAME }}:
+    create: false
+    stringData: {}

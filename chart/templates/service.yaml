@@ -1,0 +1,19 @@
+{{- range $name, $val := .Values.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "chart.labels" $ | nindent 4 }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  type: {{ $val.type }}
+  ports:
+    - port: {{ $val.port }}
+      targetPort: {{ $val.targetPort }}
+      protocol: {{ $val.protocol }}
+      name: {{ $val.name }}
+  selector:
+    {{- include "chart.selectorLabels" $ | nindent 4 }}
+{{ end -}}
