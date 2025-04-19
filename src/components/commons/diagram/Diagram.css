@@ -1,0 +1,11 @@
+@layer utilities {
+    .react-flow {
+        .react-flow__background {
+            --xy-background-color-default: var(--color-diagram-bg);
+        }
+
+        .react-flow__edge {
+            --xy-edge-stroke-width-default: 2;
+        }
+    }
+}
