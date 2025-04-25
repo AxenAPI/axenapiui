@@ -1,0 +1,20 @@
+@layer utilities {
+  .collapse-component {
+    .ant-collapse-header-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ant-collapse-header {
+      padding: 8px 12px 8px 8px;
+    }
+
+    .ant-collapse-content-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 4px 12px 12px 12px;
+    }
+  }
+}
