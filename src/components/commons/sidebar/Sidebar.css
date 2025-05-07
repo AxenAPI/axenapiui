@@ -1,0 +1,10 @@
+@layer utilities {
+  .side-bar {
+    .ant-collapse-header {
+      padding-bottom: 0;
+    }
+    .ant-collapse-content-box {
+      padding-top: 2px;
+    }
+  }
+}
