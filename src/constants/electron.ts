@@ -1,0 +1,1 @@
+export const REQUIRED_JAVA_VERSION = 21;
