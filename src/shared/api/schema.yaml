@@ -1,0 +1,1169 @@
+openapi: 3.0.1
+info:
+  title: EventGraph API
+  version: 1.0.0
+paths:
+  /addServiceToGraph:
+    post:
+      summary: Add services to an existing EventGraph from specification files
+      description: >
+        Accepts EventGraph and a list of specification files to add services.
+        Returns the updated EventGraph and a list of errors if any.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  example: ["service1.yaml", "service2.yaml"]
+                eventGraph:
+                  $ref: '#/components/schemas/EventGraphDTO'
+              required:
+                - files
+                - eventGraph
+      responses:
+        '200':
+          description: Updated EventGraph with added services
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventGraphDTO'
+        '400':
+          description: Bad request with errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/BaseResponse'
+                        - type: object
+                          properties:
+                            fileName:
+                              type: string
+                            errorMessage:
+                              type: string
+                          example:
+                            fileName: "service1.yaml"
+                            errorMessage: "Invalid service definition"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /upload:
+    post:
+      summary: Upload files and get EventGraph
+      description: >
+        Accepts a list of files and returns an EventGraph object.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  example: ["graph1.json", "graph2.json"]
+              required:
+                - files
+      responses:
+        '200':
+          description: Successful response with EventGraph
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventGraphDTO'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /generateSpec:
+    post:
+      summary: Validate EventGraph and generate OpenAPI specification
+      description: >
+        Accepts an EventGraph object and validates whether it can generate an OpenAPI specification.
+        Returns status "OK" and links to generated specification files on success,
+        or status "ERROR" with an error message otherwise.
+      parameters:
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [ json, yaml ]
+            default: json
+          required: false
+          description: Format of the downloadable specification file (default is json)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventGraphDTO'
+      responses:
+        '200':
+          description: OpenAPI specification generation successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      downloadLinks:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: Links to the generated specification files
+                        example:
+                          "openapi.json": "http://example.com/openapi.json"
+        '400':
+          description: Validation or specification generation failed due to invalid input or unsupported format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error during processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /generateCode:
+    post:
+      summary: Generate service code from EventGraphDTO
+      description: >
+        Accepts an EventGraphDTO, generates OpenAPI specifications for each service node
+        Returns the generated link for download files as zip archive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventGraphDTO'
+      responses:
+        '200':
+          description: Download link zip files archive
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid EventGraphDTO structure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error during code generation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /calculateAllPaths:
+    post:
+      summary: Calculate all paths in the EventGraph
+      description: >
+        Accepts an EventGraph object and two node UUIDs (`from`, `to`). 
+        Returns all found paths between these nodes as arrays of LinkDTOs and a list of unique tags used in the paths.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventGraph:
+                  $ref: '#/components/schemas/EventGraphDTO'
+                from:
+                  type: string
+                  format: uuid
+                  description: Starting node UUID
+                to:
+                  type: string
+                  format: uuid
+                  description: Destination node UUID
+              required:
+                - eventGraph
+                - from
+                - to
+      responses:
+        '200':
+          description: Successfully calculated paths
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      paths:
+                        type: array
+                        description: List of all paths (each path is a list of links)
+                        items:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/LinkDTO'
+                      uniqueTags:
+                        type: array
+                        description: All unique tags found in the paths
+                        items:
+                          type: string
+                        uniqueItems: true
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /getServiceSpecification:
+    post:
+      summary: Get specification for a service node
+      description: >
+        Accepts a service node UUID and returns the OpenAPI specification as a string.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceNodeId:
+                  type: string
+                  format: uuid
+                  description: UUID of the service node
+                eventGraph:
+                  $ref: '#/components/schemas/EventGraphDTO'
+              required:
+                - serviceNodeId
+                - eventGraph
+      responses:
+        '200':
+          description: Successfully retrieved service specification
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      serviceNodeId:
+                        type: string
+                        format: uuid
+                        description: UUID of the service node
+                      specification:
+                        type: string
+                        description: OpenAPI specification as a string
+                        example: "openapi: 3.0.1\ninfo:\n  title: Service API\n  version: 1.0.0\n..."
+        '400':
+          description: Invalid input or service node not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /updateServiceSpecification:
+    post:
+      summary: Update a service node with new specification
+      description: >
+        Accepts a service node UUID and a new specification string.
+        Updates the service in the EventGraph and returns the updated EventGraph.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceNodeId:
+                  type: string
+                  format: uuid
+                  description: UUID of the service node to update
+                specification:
+                  type: string
+                  description: New OpenAPI specification as a string
+                  example: "openapi: 3.0.1\ninfo:\n  title: Updated Service API\n  version: 1.0.0\n..."
+                eventGraph:
+                  $ref: '#/components/schemas/EventGraphDTO'
+                  description: Current EventGraph containing the service to update
+              required:
+                - serviceNodeId
+                - specification
+                - eventGraph
+      responses:
+        '200':
+          description: Successfully updated service specification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventGraphDTO'
+        '400':
+          description: Invalid input, service node not found, or invalid specification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /generateJsonExample:
+    post:
+      summary: Generate a JSON example from a JSON schema
+      description: >
+        Accepts a JSON schema as a string and generates an example JSON based on the schema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jsonSchema:
+                  type: string
+                  description: The JSON schema as a string.
+              required:
+                - jsonSchema
+      responses:
+        '200':
+          description: A JSON example generated from the provided schema.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: Message code
+                  jsonExample:
+                    type: string
+                    description: The generated JSON example as a string.
+        '400':
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /generateJsonSchema:
+    post:
+      summary: Generate a JSON schema from JSON input
+      description: >
+        Accepts a JSON input as a string and generates a JSON schema based on that input.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jsonInput:
+                  type: string
+                  description: The JSON input as a string.
+              required:
+                - jsonInput
+      responses:
+        '200':
+          description: A JSON schema generated from the provided JSON input.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schema:
+                    type: string
+                    description: The generated JSON schema as a string.
+                  code:
+                    type: integer
+                    description: Message code
+        '400':
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /generateMarkdown:
+    post:
+      summary: Generate Markdown documentation from EventGraphDTO
+      description: >
+        Accepts an EventGraphDTO object and an optional list of service UUIDs.
+        Generates Markdown documentation for the selected services and their interactions,
+        or for the entire graph if no IDs are specified.
+        Returns a download link to the generated README.md file.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventGraphDTO'
+      parameters:
+        - in: query
+          name: serviceIds
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: Optional list of service UUIDs to generate documentation for.
+          required: false
+      responses:
+        '200':
+          description: Markdown documentation generation successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      downloadLinks:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        example:
+                          "README.md": "http://localhost:8080/generated-markdown/output-abc123/README.md"
+        '400':
+          description: Invalid EventGraphDTO input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error during Markdown generation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /generateDocx:
+    post:
+      summary: Generate DOCX documentation from EventGraphDTO
+      description: >
+        Accepts an EventGraphDTO object and an optional list of service UUIDs.
+        Generates DOCX documentation for the selected services and their interactions,
+        or for the entire graph if no IDs are specified.
+        Returns a download link to the generated README.docx file.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventGraphDTO'
+      parameters:
+        - in: query
+          name: serviceIds
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: Optional list of service UUIDs to generate documentation for.
+          required: false
+      responses:
+        '200':
+          description: DOCX documentation generation successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "OK"
+                      downloadLinks:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        example:
+                          "README.docx": "http://localhost:8080/generated-docx/output-abc123/README.docx"
+        '400':
+          description: Invalid EventGraphDTO input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error during DOCX generation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /generatePdf:
+    post:
+      summary: Generate PDF documentation from EventGraphDTO
+      description: >
+        Accepts an EventGraphDTO object and an optional list of service UUIDs.
+        Generates PDF documentation for the selected services and their interactions,
+        or for the entire graph if no IDs are specified.
+        Returns a download link to the generated README.pdf file.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventGraphDTO'
+      parameters:
+        - in: query
+          name: serviceIds
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: Optional list of service UUIDs to generate documentation for.
+          required: false
+      responses:
+        '200':
+          description: PDF documentation generation successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "OK"
+                      downloadLinks:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        example:
+                          "README.pdf": "http://localhost:8080/generated-pdf/output-abc123/README.pdf"
+                      message:
+                        type: string
+                        example: "PDF documentation successfully generated."
+        '400':
+          description: Invalid EventGraphDTO input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error during PDF generation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /generateAllServicePdf:
+    post:
+      summary: Generate PDF documentation from EventGraphDTO
+      description: >
+        Accepts an EventGraphDTO object and generates a single consolidated PDF (or DOCX) document
+        containing both the documentation and specifications for all services in the graph.
+        For each service, a Markdown-based section is created and converted to PDF, preserving
+        any links between services. At the end of the PDF, the raw specifications for each service
+        are appended, each prefixed with a heading "Specification of service <service name>".
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventGraphDTO'
+      responses:
+        '200':
+          description: PDF documentation generation successful
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+              examples:
+                example1:
+                  summary: Example DOCX file
+                  value: (binary content)
+        '400':
+          description: Invalid EventGraphDTO input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ERROR"
+                  message:
+                    type: string
+                    example: "Invalid EventGraph structure"
+        '500':
+          description: Internal server error during PDF generation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ERROR"
+                  message:
+                    type: string
+                    example: "Failed to generate PDF documentation"
+  /download/docx/{fileId}.docx:
+    get:
+      summary: Download DOCX specification by fileId
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identifier of the DOCX specification
+      responses:
+        '200':
+          description: DOCX file successfully retrieved
+          content:
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: DOCX file not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Error while reading DOCX blob
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /download/pdf/{fileId}.pdf:
+    get:
+      summary: Download PDF specification by fileId
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identifier of the PDF specification
+      responses:
+        '200':
+          description: PDF file successfully retrieved
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: PDF file not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Error while reading PDF blob
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /download/markdown/{fileId}.md:
+    get:
+      summary: Download Markdown specification by fileId
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identifier of the Markdown specification
+      responses:
+        '200':
+          description: Markdown file successfully retrieved
+          content:
+            text/markdown:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Markdown file not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Error while reading Markdown CLOB
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /download/specs/{fileId}.json:
+    get:
+      summary: Download JSON specification by fileId
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identifier of the JSON specification
+      responses:
+        '200':
+          description: JSON specification successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: JSON file not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Error while reading JSON CLOB
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /download/specs/{fileId}.yaml:
+    get:
+      summary: Download YAML specification by fileId
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identifier of the YAML specification
+      responses:
+        '200':
+          description: YAML specification successfully retrieved
+          content:
+            application/x-yaml:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: YAML file not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Error while reading YAML CLOB
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /saveMarkdown:
+    post:
+      summary: Save Markdown text to a file
+      description: >
+        Accepts Markdown content and a relative file path, then saves the content to a .md file on the server.
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+          description: Git token, e.g. "Bearer ghp_xxx..."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - markdown
+                - filePath
+              properties:
+                markdown:
+                  type: string
+                  example: |
+                    # Title
+                    Some **markdown** content.
+                filePath:
+                  type: string
+                  description: Relative path (e.g., "markdown/readme_1.md")
+                  example: "markdown/readme_1.md"
+      responses:
+        '201':
+          description: Markdown file successfully saved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      filePath:
+                        type: string
+                        example: "/files/markdown/readme_1.md"
+        '400':
+          description: Invalid Markdown input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Internal server error during saving Markdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /cloneDocumentation:
+    post:
+      summary: Clone documentation
+      description: >
+        Return path where documentation was cloned
+      responses:
+        '200':
+          description: Documentation was cloned successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal server error cloning documentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /commitDocumentation:
+    post:
+      summary: commit documentation
+      description: >
+        commit documentation
+      responses:
+        '201':
+          description: documentation was committed
+        '500':
+          description: Internal server error commit documentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /createMRDocumentation:
+    post:
+      summary: create MR documentation
+      description: >
+        Return merge request url
+      responses:
+        '200':
+          description: Merge request was created successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal server error creating merge request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /addDocumentation:
+    post:
+      summary: git add documentation
+      description: >
+        git add documentation
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              description: Path to documentation file in repository
+              example: section1/readme_1.md
+      responses:
+        '200':
+          description: documentation was added
+        '500':
+          description: Internal server error add documentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Simple endpoint to check if the service is up and running.
+      responses:
+        '200':
+          description: Service is running
+components:
+  schemas:
+    EventGraphDTO:
+      type: object
+      properties:
+        name:
+          description: Name of the EventGraph.
+          type: string
+          example: SampleEventGraph
+        nodes:
+          description: List of nodes in the EventGraph.
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeDTO'
+          example:
+            - id: 123e4567-e89b-12d3-a456-426614174000
+              name: ServiceNode1
+              type: SERVICE
+              belongsToGraph: ["ServiceNode1"]
+            - id: 223e4567-e89b-12d3-a456-426614174003
+              name: ServiceNode2
+              type: SERVICE
+              belongsToGraph: ["ServiceNode2"]
+            - id: 323e4567-e89b-12d3-a456-426614174006
+              name: TopicNode1
+              type: TOPIC
+              belongsToGraph: ["ServiceNode1"]
+            - id: 323e4567-e89b-12d3-a456-426614174008
+              name: TopicNode2
+              type: TOPIC
+              belongsToGraph: [ServiceNode2]
+        events:
+          description: List of nodes in the EventGraph.
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDTO'
+        links:
+          description: List of links in the EventGraph.
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkDTO'
+          example:
+            - fromId: 123e4567-e89b-12d3-a456-426614174000
+              toId: 323e4567-e89b-12d3-a456-426614174006
+              eventId: 123e4567-e89b-12d3-a456-426614174001
+            - fromId: 223e4567-e89b-12d3-a456-426614174003
+              toId: 323e4567-e89b-12d3-a456-426614174008
+              eventId: 223e4567-e89b-12d3-a456-426614174004
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDTO'
+          example:
+            - fileName: "service1.yaml"
+              errorMessage: "Invalid service definition"
+        tags:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+
+    NodeDTO:
+      type: object
+      properties:
+        id:
+          description: Unique identifier for the node.
+          type: string
+          format: uuid
+        nodeDescription:
+          description: Description of node
+          type: string
+        nodeUrl:
+          description: URL og HTTP node(only for HTTP nodes)
+          type: string
+        belongsToGraph:
+          description: List of nodes(services) - ids - to which the node belongs.
+          type: array
+          items:
+            type: string
+            format: uuid
+        name:
+          type: string
+        type:
+          description: "Type of the node. SERVICE or TOPIC. not NULL"
+          type: string
+          enum:
+            - SERVICE
+            - TOPIC
+            - HTTP
+        brokerType:
+          description: "Broker type for the node. null if: no broker type is specified or node is SERVICE. Kafka, JMS, RabbitMQ are supported."
+          type: string
+          enum:
+            - KAFKA
+            - JMS
+            - RABBITMQ
+            - UNDEFINED
+        requestBody:
+          description: "Schema of request body"
+          type: string
+        responseBody:
+          description: "Schema of response body"
+          type: string
+        methodType:
+          description: "http method type"
+          enum:
+            - GET
+            - POST
+            - PUT
+            - HEAD
+            - DELETE
+            - PATCH
+            - OPTIONS
+            - CONNECT
+            - TRACE
+        tags:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        documentationFileLinks:
+          description: "List of documentation files related to this node (service, topic, http)."
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+
+      required:
+        - name
+        - type
+        - belongsToGraph
+    EventDTO:
+      type: object
+      required:
+        - id
+        - schema
+        - name
+      properties:
+        id:
+          description: Unique identifier for the event.
+          type: string
+          format: uuid
+        schema:
+          type: string
+        name:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        eventType:
+          type: string
+        eventDescription:
+          type: string
+    LinkDTO:
+      description: Link between two nodes in the EventGraph.
+      type: object
+      required:
+        - fromId
+        - toId
+        - eventId
+      properties:
+        id:
+          type: string
+          format: uuid
+        fromId:
+          type: string
+          format: uuid
+        toId:
+          type: string
+          format: uuid
+        group:
+          type: string
+        eventId:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+    ErrorDTO:
+      description: Error message for a file upload or EventGraph validation.
+      type: object
+      properties:
+        fileName:
+          type: string
+        errorMessage:
+          type: string
+      required:
+        - fileName
+        - errorMessage
+    ServiceInfo:
+      description: Object who saved info about service
+      type: object
+      properties:
+        specificationPath:
+          type: string
+        port:
+          type: string
+        name:
+          type: string
+        brokerAddress:
+          type: string
+    MDResponse:
+      type: object
+      properties:
+        mdString:
+          type: string
+    BaseResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 50001
+          description: Message code
+        message:
+          type: string
+          example: "Empty response from specification generator"
+          description: Response message
+        status:
+          type: string
+          example: "ERROR"
+          description: Indicates failure due to client error
