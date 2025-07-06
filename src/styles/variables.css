@@ -1,0 +1,44 @@
+:root {
+  /* Colors */
+  --dark: #222429;
+  --white: #ffffff;
+}
+
+@theme {
+  --color-item-hover-bg: #f0f0f0;
+  --color-item-selected-bg: #fff8f0;
+  --color-item-selected-text: #f37022;
+  --color-diagram-bg: #e4e7eb;
+  --color-colorful-purple-bg: #f9f0ff;
+  --color-colorful-green-border: #6edb8f;
+  --color-colorful-blue-border: #91caff;
+  --color-colorful-purple-border: #d3adf7;
+  --color-dark-item-bg: #212121;
+  --color-placeholder: #a6a6a6;
+  --color-background-grey: #fbfbfb;
+  --color-colorful-green-bg: #dcf5e2;
+  --color-colorful-blue-bg: #e6f4ff;
+  --color-text-tertiary: #a6a6a6;
+  --color-fill-alter: #fafafa;
+  --color-color-text: #1f1f1f;
+  --color-color-icon: #595959;
+  --color-color-error: #ff4d4f;
+  --color-expandable-edge: #4d668b;
+
+  /* Font-weight variables from Figma */
+  /* Typography/Font Weight */
+  --font-weight-strong: 600;
+  --font-weight-normal: 400;
+
+  /* Font-size variables from Figma  */
+  /* Typography/Font Size */
+  --text-font-size-sm: 12px;
+  --text-font-size-heading-5: 16px;
+  --text-font-size-heading-4: 20px;
+
+  /* Line-height variables from Figma  */
+  /* Typography/Line Height */
+  --leading-line-height-sm: 20px;
+  --leading-line-height-heading-5: 24px;
+  --leading-line-height-heading-4: 28px;
+}

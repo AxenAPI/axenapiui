@@ -1,0 +1,9 @@
+.mdxeditor-toolbar {
+  :first-child {
+    flex-wrap: wrap;
+  }
+}
+
+._contentEditable_sects_380 {
+  padding: var(--spacing-6) !important;
+}
