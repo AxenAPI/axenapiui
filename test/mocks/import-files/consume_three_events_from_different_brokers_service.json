@@ -1,0 +1,59 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "consume_three_events_from_different_brokers_service",
+    "description": "AxenAPI Specification for a service that consume an event from a single Kafka topic",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/kafka/group1/topicKafka/EventKafka": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event consumed  successfully"
+          }
+        }
+      }
+    },
+    "/jms/topicJMS/EventJMS": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event sent successfully"
+          }
+        }
+      }
+    },
+    "/rabbitmq/topicRabbitMQ/EventRabbitMQ": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event sent successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EventKafka": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["topicKafka"]
+        }
+      },
+      "EventJMS": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["topicJMS"]
+        }
+      },
+      "EventRabbitMQ": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["topicRabbitMQ"]
+        }
+      }
+    }
+  }
+}

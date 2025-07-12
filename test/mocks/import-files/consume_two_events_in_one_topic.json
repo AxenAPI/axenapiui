@@ -1,0 +1,46 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "consume_one_event_service",
+    "description": "AxenAPI Specification for a service that consume an event from a single Kafka topic",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/kafka/group1/topic1/Event1": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event sent successfully"
+          }
+        },
+        "tags": ["event1"]
+      }
+    },
+    "/kafka/group1/topic1/Event2": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event sent successfully"
+          }
+        },
+        "tags": ["event2"]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Event1": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["topic1"]
+        }
+      },
+      "Event2": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["topic1"]
+        }
+      }
+    }
+  }
+}

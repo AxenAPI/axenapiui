@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "src/**/*.{ts,tsx,js,jsx}",
+    "!src/**/*.{test, spec}.*",
+    "!src/__mocks__/**",
+    "!src/shared/api/event-graph-api/**",
+    "!data/**"
+  ],
+  "testRunner": "jest",
+  "reporters": ["progress", "clear-text", "html"],
+  "coverageAnalysis": "perTest",
+  "jest": {
+    "projectType": "custom",
+    "configFile": "jest.config.ts",
+    "enableFindRelatedTests": true
+  },
+  "checkers": ["typescript"],
+  "tsconfigFile": "tsconfig.json",
+  "cleanTempDir": true,
+  "ignoreStatic": true
+}

@@ -1,0 +1,100 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "service_no_common_consume_topics_common_events_common_outgoing_topics_1",
+    "description": "AxenAPI Specification for a service that consume an event from a single Kafka topic",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/kafka/group1/commonConsumeKafka/EventCommonConsumeKafka": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event consumed  successfully"
+          }
+        },
+        "tags": ["tagKafkaConsume1", "commonTag"]
+      }
+    },
+    "/kafka/group1/topicConsumeKafka_1/EventConsumeKafka": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event consumed  successfully"
+          }
+        },
+        "tags": ["topicConsumeKafka_1"]
+      }
+    },
+    "/jms/topicConsumeJMS_1/EventConsumeJMS": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event consumed  successfully"
+          }
+        },
+        "tags": ["topicConsumeJMS_1"]
+      }
+    },
+    "/rabbitmq/topicConsumeRabbitMQ_1/EventConsumeRabbitMQ": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Event consumed  successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EventCommonConsumeKafka": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["commonConsumeKafka"]
+        }
+      },
+      "EventOutgoingKafka": {
+        "type": "object",
+        "x-outgoing": {
+          "topics": ["kafka/topicOutKafka"]
+        }
+      },
+      "EventOutgoingRabbitMQ": {
+        "type": "object",
+        "x-outgoing": {
+          "topics": [
+            {
+              "name": "rabbitmq/topicOutRabbitMQ",
+              "tags": ["commonOutgoingTag", "service1"]
+            }
+          ]
+        }
+      },
+      "EventOutgoingJMS": {
+        "type": "object",
+        "x-outgoing": {
+          "topics": ["jms/topicOutJMS"]
+        }
+      },
+      "EventConsumeKafka": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["topicConsumeKafka_1"]
+        }
+      },
+      "EventConsumeRabbitMQ": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["topicConsumeRabbitMQ_1"]
+        }
+      },
+      "EventConsumeJMS": {
+        "type": "object",
+        "x-incoming": {
+          "topics": ["topicConsumeJMS_1"]
+        }
+      }
+    }
+  }
+}
