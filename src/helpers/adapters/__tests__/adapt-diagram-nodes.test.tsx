@@ -1,9 +1,11 @@
-import {ENodeTypes} from '@/enums/common';
-import {adaptDiagramNodes} from '@/helpers/adapters';
-import {formatSimpleNodes} from '@/helpers/diagram-helpers/node-formatters';
-import {getExpandedEventNodeId} from '@/helpers/node-helpers';
-import {Consume2Events1Topic, EventGraph1, EventGraph2} from '@/shared/data-mock';
-import {TNode, TOptionalPosition} from '@/types/common';
+import { Consume2Events1Topic, EventGraph1, EventGraph2 } from '@shared/data-mock';
+import { EventGraphDTO } from '@shared/openapi';
+
+import { ENodeTypes } from '@/enums/common';
+import { adaptDiagramNodes } from '@/helpers/adapters';
+import { formatSimpleNodes } from '@/helpers/diagram-helpers/node-formatters';
+import { getExpandedEventNodeId } from '@/helpers/node-helpers';
+import { TNode, TOptionalPosition } from '@/types/common';
 
 import {
   expandableItemMockConsume2Events1Topic,
@@ -15,18 +17,24 @@ import {
 
 describe('/src/helpers/adapters/adapt-diagram-nodes.tsx', () => {
   test.each([
-    {name: 'EventGraph1', input: EventGraph1, expected: expectedEventGraphNodes1},
-    {name: 'EventGraph2', input: EventGraph2, expected: expectedEventGraphNodes2},
-    {name: 'Consume2Events1Topic', input: Consume2Events1Topic, expected: expectedConsume2Events1TopicNodes},
-  ])('should correctly transform nodes into TCustomNode array', ({expected, input}) => {
+    { name: 'EventGraph1', input: EventGraph1, expected: expectedEventGraphNodes1 },
+    { name: 'EventGraph2', input: EventGraph2, expected: expectedEventGraphNodes2 },
+    { name: 'Consume2Events1Topic', input: Consume2Events1Topic, expected: expectedConsume2Events1TopicNodes },
+  ])('should correctly transform nodes into TCustomNode array', ({ expected, input }) => {
     const result: TOptionalPosition<TNode>[] = adaptDiagramNodes(input);
     expect(result).toEqual(expected);
   });
 
-  test('should return an empty array if no nodes are provided', () => {
-    expect(adaptDiagramNodes({nodes: []})).toEqual([]);
-    expect(adaptDiagramNodes({nodes: null})).toEqual([]);
-    expect(adaptDiagramNodes({nodes: undefined})).toEqual([]);
+  test('should return an empty array if nodes array is empty', () => {
+    const graphWithEmptyNodes: EventGraphDTO = {
+      name: 'empty-nodes-graph',
+      nodes: [],
+      events: [],
+      tags: [],
+      errors: [],
+      links: [],
+    };
+    expect(adaptDiagramNodes(graphWithEmptyNodes)).toEqual([]);
   });
 
   test('should handle expandable items correctly', () => {
@@ -44,7 +52,7 @@ describe('/src/helpers/adapters/adapt-diagram-nodes.tsx', () => {
         data: {
           name: 'Already existing node',
           nodeType: 'SERVICE',
-          brokerType: null,
+          brokerType: undefined,
         },
         type: 'custom',
         position: {

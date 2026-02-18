@@ -1,17 +1,17 @@
-import {BaseEdge, getBezierPath, type EdgeProps} from '@xyflow/react';
+import { BaseEdge, getBezierPath } from '@xyflow/react';
 import clsx from 'clsx';
-import {useUnit} from 'effector-react';
-import {type FC, useCallback} from 'react';
+import { useUnit } from 'effector-react';
+import { useCallback } from 'react';
 
-import {shrinkItemByTopicId} from '@/components/commons/diagram/model/ExpandableItemsModel';
-import {useSingleAndDoubleClick} from '@/hooks/useSingleAndDoubleClick';
-import type {TExpandableItem} from '@/types/common';
+import { shrinkItemByTopicId } from '@/components/commons/diagram/model/ExpandableItemsModel';
+import type { TEdgeProps } from '@/constants/reactflow';
+import { useSingleAndDoubleClick } from '@/hooks/useSingleAndDoubleClick';
 
-import {$hiddenItems} from '../model/HiddenItemsModel';
+import { $hiddenItems } from '../model/HiddenItemsModel';
 
-export type IExpandableEdgeProps = Partial<EdgeProps & {data: TExpandableItem}>;
+export type ISimpleEdgeProps = TEdgeProps;
 
-export const SimpleEdge: FC<IExpandableEdgeProps> = ({
+export function SimpleEdge({
   data,
   id,
   sourcePosition,
@@ -20,7 +20,7 @@ export const SimpleEdge: FC<IExpandableEdgeProps> = ({
   targetPosition,
   targetX,
   targetY,
-}) => {
+}: ISimpleEdgeProps) {
   const hiddenItems = useUnit($hiddenItems);
 
   const [edgePath] = getBezierPath({
@@ -50,4 +50,4 @@ export const SimpleEdge: FC<IExpandableEdgeProps> = ({
       />
     </g>
   );
-};
+}

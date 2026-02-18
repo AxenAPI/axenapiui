@@ -1,6 +1,6 @@
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO } from '@shared/openapi';
 
-import {getLinkFormData} from './modal-helpers/getLinkFormData';
+import { getLinkFormData } from './modal-helpers/getLinkFormData';
 
 /**
  * Функиця фильтрует sidebar меню.
@@ -25,9 +25,9 @@ export const filterSidebarPanel = (eventGraphData: EventGraphDTO, filterText: st
     const nodes = eventGraphData?.nodes;
     if (filterText.length === 0) return link;
 
-    const {fromId, toId} = link;
+    const { fromId, toId } = link;
 
-    const {httpNode, topicNode} = getLinkFormData(nodes, fromId, toId);
+    const { httpNode, topicNode } = getLinkFormData(nodes, fromId, toId);
 
     return (
       httpNode?.name.toLowerCase().includes(filterText.toLowerCase()) ||

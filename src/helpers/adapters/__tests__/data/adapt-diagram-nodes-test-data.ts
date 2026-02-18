@@ -1,4 +1,4 @@
-import {TCustomNode, TNode, TOptionalPosition} from '@/types/common';
+import { TCustomNode, TNode, TOptionalPosition } from '@/types/common';
 
 export const expectedEventGraphNodes1: TOptionalPosition<TCustomNode>[] = [
   {
@@ -6,7 +6,7 @@ export const expectedEventGraphNodes1: TOptionalPosition<TCustomNode>[] = [
     data: {
       name: 'consume_one_event_service',
       nodeType: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
     },
     type: 'custom',
   },
@@ -27,7 +27,7 @@ export const expectedEventGraphNodes2: TOptionalPosition<TCustomNode>[] = [
     data: {
       name: 'consume_three_events_from_different_brokers_service',
       nodeType: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
     },
     type: 'custom',
   },
@@ -66,7 +66,7 @@ export const expectedConsume2Events1TopicNodes: TOptionalPosition<TNode>[] = [
     data: {
       name: 'consume_one_event_service',
       nodeType: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
     },
     type: 'custom',
   },

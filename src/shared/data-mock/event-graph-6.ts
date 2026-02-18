@@ -1,4 +1,4 @@
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO } from '@shared/openapi';
 
 export const EventGraph6: EventGraphDTO = {
   name: 'service_no_common_consume_topics_common_events_common_outgoing_topics_2&service_no_common_consume_topics_common_events_common_outgoing_topics_1',
@@ -9,14 +9,14 @@ export const EventGraph6: EventGraphDTO = {
       belongsToGraph: ['12345678-90ab-cdef-1234-567890abcdef'],
       name: 'service_no_common_consume_topics_common_events_common_outgoing_topics_1',
       type: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
     },
     {
       id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       belongsToGraph: ['a1b2c3d4-e5f6-7890-1234-567890abcdef'],
       name: 'service_no_common_consume_topics_common_events_common_outgoing_topics_2',
       type: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
     },
     {
       id: 'b2c3d4e5-f678-9012-3456-7890abcdef03',
@@ -84,63 +84,75 @@ export const EventGraph6: EventGraphDTO = {
   ],
   links: [
     {
+      id: 'l1',
       fromId: '12345678-90ab-cdef-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef09',
       eventId: 'c3d4e5f6-7890-1234-5678-90abcdef012a',
     },
     {
+      id: 'l2',
       fromId: '12345678-90ab-cdef-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef10',
       eventId: 'bdc6803e-5395-45f2-aece-c359de3d3f0b',
     },
     {
+      id: 'l3',
       fromId: '12345678-90ab-cdef-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef11',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde1',
     },
     {
+      id: 'l4',
       fromId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef09',
       eventId: 'c3d4e5f6-7890-1234-5678-90abcdef012a',
     },
     {
+      id: 'l5',
       fromId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef10',
       eventId: 'bdc6803e-5395-45f2-aece-c359de3d3f0b',
     },
     {
+      id: 'l6',
       fromId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef11',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde1',
     },
     {
+      id: 'l7',
       toId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef04',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde2',
       group: 'group1',
     },
     {
+      id: 'l8',
       toId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef06',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde3',
     },
     {
+      id: 'l9',
       toId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef08',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde4',
     },
     {
+      id: 'l10',
       toId: '12345678-90ab-cdef-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef03',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde2',
       group: 'group1',
     },
     {
+      id: 'l11',
       toId: '12345678-90ab-cdef-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef05',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde3',
     },
     {
+      id: 'l12',
       toId: '12345678-90ab-cdef-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef07',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde4',

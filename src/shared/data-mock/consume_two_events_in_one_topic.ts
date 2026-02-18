@@ -1,4 +1,4 @@
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO } from '@shared/openapi';
 
 export const Consume2Events1Topic: EventGraphDTO = {
   name: 'consume_one_event_service',
@@ -9,7 +9,7 @@ export const Consume2Events1Topic: EventGraphDTO = {
       belongsToGraph: ['a1b2c3d4-e5f6-7890-1234-567890abcdef'],
       name: 'consume_one_event_service',
       type: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
       tags: ['event1', 'event2'],
     },
     {

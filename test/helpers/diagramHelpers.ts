@@ -1,6 +1,6 @@
-import {Page, expect, Locator} from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
-import {EConnectionType} from '../../src/enums/common';
+import { EConnectionType } from '@/enums/common';
 
 /**
  * Вспомогательная функция для загрузки файла
@@ -13,9 +13,7 @@ export async function uploadFile(page: Page, filePaths: string[]) {
 
   // Настройка видимости поля ввода файла
   await importFileInput.evaluate(el => {
-    // eslint-disable-next-line no-param-reassign
     el.style.display = 'block';
-    // eslint-disable-next-line no-param-reassign
     el.style.visibility = 'visible';
   });
 
@@ -132,7 +130,7 @@ export async function validateDiagramState(
  * Функция для добавления сервиса путем клика на кнопку 'Service' в верхней панели
  */
 export async function addService(page: Page) {
-  const serviceAddButton = page.getByTestId('panel').locator('.ant-btn', {hasText: 'Service'});
+  const serviceAddButton = page.getByTestId('panel').locator('.ant-btn', { hasText: 'Service' });
   await serviceAddButton.click();
 }
 
@@ -140,7 +138,7 @@ export async function addService(page: Page) {
  * Функция для добавления топика путем клика на кнопку 'Topic' в верхней панели
  */
 export async function addTopic(page: Page) {
-  const topicAddButton = page.getByTestId('panel').locator('.ant-btn', {hasText: 'Topic'});
+  const topicAddButton = page.getByTestId('panel').locator('.ant-btn', { hasText: 'Topic' });
   await topicAddButton.click();
 }
 
@@ -148,7 +146,7 @@ export async function addTopic(page: Page) {
  * Функция для добавления HTTP узла путем клика на кнопку 'HTTP-node' в верхней панели
  */
 export async function addHttpNode(page: Page) {
-  const httpAddButton = page.getByTestId('panel').locator('.ant-btn', {hasText: 'HTTP'});
+  const httpAddButton = page.getByTestId('panel').locator('.ant-btn', { hasText: 'HTTP' });
   await httpAddButton.click();
 }
 
@@ -156,31 +154,31 @@ export async function addHttpNode(page: Page) {
  * Функция для добавления события путем клика на кнопку 'Event' в верхней панели
  */
 export async function addEvent(page: Page, eventName: string = '123') {
-  const eventAddButton = page.getByTestId('panel').locator('.ant-btn', {hasText: 'Event'});
+  const eventAddButton = page.getByTestId('panel').locator('.ant-btn', { hasText: 'Event' });
   await eventAddButton.click();
   await page.fill('input[data-testid="event-drawer-name-input"]', eventName);
-  await page.locator('button', {hasText: 'Create'}).click();
+  await page.locator('button', { hasText: 'Create' }).click();
 }
 
 /**
  * Функция для добавления связи путем клика на кнопку 'Link' в верхней панели
  */
 export async function addLink(page: Page, eventName: string, connectionType: EConnectionType) {
-  const eventAddButton = page.getByTestId('panel').locator('.ant-btn', {hasText: 'Link'});
+  const eventAddButton = page.getByTestId('panel').locator('.ant-btn', { hasText: 'Link' });
   await eventAddButton.click();
 
   await page.click('div[data-testid="create-link-drawer-service-select"]');
-  await page.locator('.ant-select-dropdown', {hasText: 'Service'}).click();
+  await page.locator('.ant-select-dropdown', { hasText: 'Service' }).click();
 
   await page.click('div[data-testid="create-link-drawer-topic-select"]');
-  await page.locator('.ant-select-dropdown', {hasText: 'Topic'}).click();
+  await page.locator('.ant-select-dropdown', { hasText: 'Topic' }).click();
 
   await page.locator(`text=${connectionType}`).click();
 
   await page.click('div[data-testid="create-link-drawer-event-select"]');
-  await page.locator('.ant-select-dropdown', {hasText: eventName}).click();
+  await page.locator('.ant-select-dropdown', { hasText: eventName }).click();
 
-  await page.locator('button', {hasText: 'Create'}).click();
+  await page.locator('button', { hasText: 'Create' }).click();
 }
 
 /**
@@ -193,6 +191,10 @@ export async function dragNDropLink(sourceNode: Locator, targetNode: Locator, pa
   const sourceBox = await firstTopicSourceHandler.boundingBox();
   const targetBox = await secondTopicTargetHandler.boundingBox();
 
+  if (!sourceBox || !targetBox) {
+    throw new Error('Source or target node handlers are not visible');
+  }
+
   const startX = sourceBox.x + sourceBox.width / 2;
   const startY = sourceBox.y + sourceBox.height / 2;
   const endX = targetBox.x + targetBox.width / 2;
@@ -200,7 +202,7 @@ export async function dragNDropLink(sourceNode: Locator, targetNode: Locator, pa
 
   await page.mouse.move(startX, startY);
   await page.mouse.down();
-  await page.mouse.move(endX, endY, {steps: 1});
+  await page.mouse.move(endX, endY, { steps: 1 });
   await page.mouse.up();
 
   await page.waitForTimeout(300);

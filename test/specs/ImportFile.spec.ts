@@ -1,12 +1,12 @@
-import {expect} from '@playwright/test';
-
 import path from 'path';
 
-import {test} from '../electron.fixture';
-import {getDiagramState, uploadFile, validateDiagramState} from '../helpers/diagramHelpers';
+import { expect } from '@playwright/test';
+
+import { test } from '../electron.fixture';
+import { getDiagramState, uploadFile, validateDiagramState } from '../helpers/diagramHelpers';
 
 test.describe('scenario for loading files and building a diagram from them', () => {
-  test('should upload a valid file and render diagram with correct nodes and edges', async ({page}) => {
+  test('should upload a valid file and render diagram with correct nodes and edges', async ({ page }) => {
     const {
       edgesCount: initialEdgesCount,
       serviceNodeCount: initialServiceNodeCount,
@@ -21,14 +21,14 @@ test.describe('scenario for loading files and building a diagram from them', () 
     await uploadFile(page, [filePath]);
 
     const successNotification = page.locator('.ant-notification-notice-success');
-    await successNotification.waitFor({state: 'visible'});
+    await successNotification.waitFor({ state: 'visible' });
     await expect(successNotification).toHaveText('Import success');
 
     // Проверяем состояние диаграммы после загрузки
-    await validateDiagramState(page, {initialEdgesCount, initialServiceNodeCount, initialTopicNodeCount});
+    await validateDiagramState(page, { initialEdgesCount, initialServiceNodeCount, initialTopicNodeCount });
   });
 
-  test('should show error notification if wrong file is uploaded', async ({page}) => {
+  test('should show error notification if wrong file is uploaded', async ({ page }) => {
     const {
       edgesCount: initialEdgesCount,
       serviceNodeCount: initialServiceNodeCount,
@@ -50,7 +50,7 @@ test.describe('scenario for loading files and building a diagram from them', () 
     expect(finalEdgesCount).toEqual(initialEdgesCount);
   });
 
-  test('should upload multiple files and render diagrams with correct counts', async ({page}) => {
+  test('should upload multiple files and render diagrams with correct counts', async ({ page }) => {
     const {
       edgesCount: initialEdgesCount,
       serviceNodeCount: initialServiceNodeCount,
@@ -65,7 +65,7 @@ test.describe('scenario for loading files and building a diagram from them', () 
     await uploadFile(page, filePaths);
 
     const successNotification = page.locator('.ant-notification-notice-success');
-    await successNotification.waitFor({state: 'visible'});
+    await successNotification.waitFor({ state: 'visible' });
     await expect(successNotification).toHaveText('Import success');
 
     // Проверяем состояние диаграммы после загрузки

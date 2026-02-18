@@ -1,7 +1,7 @@
-import {type Node} from '@xyflow/react';
+import { type Node } from '@xyflow/react';
 
-import {ENodeTypes} from '@/enums/common';
-import {TNode} from '@/types/common';
+import { ENodeTypes } from '@/enums/common';
+import { TNode } from '@/types/common';
 
 /**
  * Функция адаптирует узел для использования в качестве "призрачного" (удаленного) узла

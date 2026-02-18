@@ -1,0 +1,31 @@
+.hover-container {
+  position: relative;
+}
+
+.hover-buttons {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.hover-only {
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.always-visible {
+  opacity: 1;
+}
+
+.hover-container:hover .hover-only {
+  opacity: 1;
+}
+
+@layer utilities {
+  .ant-tree {
+    .ant-tree-switcher {
+      align-self: center;
+    }
+  }
+}

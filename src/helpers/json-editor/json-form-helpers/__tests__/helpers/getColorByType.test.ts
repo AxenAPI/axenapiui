@@ -1,21 +1,21 @@
-import {getColorByType} from '@/helpers/json-editor';
-import {TSchemaObjectType} from '@/types/common';
+import { getColorByType } from '@/helpers/json-editor';
+import { TSchemaObjectType } from '@/types/common';
 
 describe('/src/helpers/json-editor/helpers.ts/getColorByType', () => {
   test('should return correct color codes for known types', () => {
     // Arrange
-    const testCases: Array<{type: TSchemaObjectType; expected: string}> = [
-      {type: 'array', expected: '#008F3E'},
-      {type: 'boolean', expected: '#D48806'},
-      {type: 'integer', expected: '#CF1322'},
-      {type: 'object', expected: '#0958D9'},
-      {type: 'number', expected: '#C41D7F'},
-      {type: 'string', expected: '#08979C'},
-      {type: 'dictionary', expected: '#CC5012'},
+    const testCases: Array<{ type: TSchemaObjectType; expected: string }> = [
+      { type: 'array', expected: '#008F3E' },
+      { type: 'boolean', expected: '#D48806' },
+      { type: 'integer', expected: '#CF1322' },
+      { type: 'object', expected: '#0958D9' },
+      { type: 'number', expected: '#C41D7F' },
+      { type: 'string', expected: '#08979C' },
+      { type: 'dictionary', expected: '#CC5012' },
     ];
 
     // Act & Assert
-    testCases.forEach(({expected, type}) => {
+    testCases.forEach(({ expected, type }) => {
       const result = getColorByType(type);
       expect(result).toBe(expected);
     });

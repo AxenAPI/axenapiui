@@ -1,7 +1,8 @@
-import {createEvent, createStore, sample} from 'effector';
+import { createEvent, createStore, sample } from 'effector';
 
-import {clearEventGraph, removeNode, removeNodes, removeNodeWithConnectedLinks} from '@/models/EventGraphModel';
-import {NodeDTO} from '@/shared/api/event-graph-api';
+import { NodeDTO } from '@shared/openapi';
+
+import { clearEventGraph, removeNode, removeNodes, removeNodeWithConnectedLinks } from '@/models/EventGraphModel';
 
 export const removeAllSelection = createEvent();
 export const toggleItemSelection = createEvent<NodeDTO['id']>();

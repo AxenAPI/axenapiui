@@ -1,11 +1,13 @@
-import {TDownloadItem} from '@/types/common';
+import type { TDownloadItem } from '@common/types';
+
+import { ElectronService } from '@shared/electron/api';
 
 // For single file download
 export const downloadFile = (file: TDownloadItem) => {
-  window.electronAPI.downloadFile(file);
+  ElectronService.downloadFile(file);
 };
 
 // For multiple files download
 export const downloadFiles = (files: TDownloadItem[]) => {
-  window.electronAPI.downloadFiles(files);
+  ElectronService.downloadFiles(files);
 };

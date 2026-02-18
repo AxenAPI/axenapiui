@@ -3,39 +3,40 @@ import {
   Drawer as UIKitDrawer,
   Form as UIKitForm,
   FormItem as UIKitFormItem,
+  Icon as UIKitIcon,
   Input as UIKitInput,
   MultipleSelect as UIKitMultipleSelect,
-  TextArea as UIKitTextArea,
-  Icon as UIKitIcon,
   NodeSkeleton as UIKitSkeleton,
+  TextArea as UIKitTextArea,
 } from '@axenix/ui-kit';
-import {Editor} from '@monaco-editor/react';
-import {useUnit} from 'effector-react';
-import {FC, useEffect} from 'react';
-import {useController, useForm} from 'react-hook-form';
-import {Copy, ExternalLink} from 'tabler-icons-react';
+import { Editor } from '@monaco-editor/react';
+import { useUnit } from 'effector-react';
+import { FC, useEffect } from 'react';
+import { useController, useForm } from 'react-hook-form';
+import { Copy, ExternalLink } from 'tabler-icons-react';
+
+import { EventDTO } from '@shared/openapi';
 
 import {
   $drawerCreateEvent,
   closeDrawerCreateEvent,
 } from '@/components/commons/diagram/model/modals-models/drawer-create-event/DrawerCreateEventModel';
-import {EMPTY_ARRAY, EMPTY_CHAR} from '@/constants/common';
-import {copyToClipboard} from '@/helpers/copy-to-clipboard';
-import {SimpleValues} from '@/helpers/SimpleValues';
-import {$eventGraph, addEvent, addTag, editEvent} from '@/models/EventGraphModel';
-import {EventDTO} from '@/shared/api/event-graph-api';
+import { EMPTY_ARRAY, EMPTY_CHAR } from '@/constants/common';
+import { copyToClipboard } from '@/helpers/copy-to-clipboard';
+import { createSimpleOptions } from '@/helpers/SimpleValues';
+import { $eventGraph, addEvent, addTag, editEvent } from '@/models/EventGraphModel';
 
 export const DrawerCreateEvent: FC = () => {
   const drawerCreateEvent = useUnit($drawerCreateEvent);
   const eventGraph = useUnit($eventGraph);
-  const {eventId, isOpen} = drawerCreateEvent;
+  const { eventId, isOpen } = drawerCreateEvent;
 
   const eventToEdit = eventGraph?.events?.find(item => item.id === eventId);
-  const tagOptions = eventGraph && eventGraph.tags ? new SimpleValues(...eventGraph.tags) : [];
+  const tagOptions = eventGraph && eventGraph.tags ? createSimpleOptions(...eventGraph.tags) : [];
 
   const {
     control,
-    formState: {errors},
+    formState: { errors },
     handleSubmit,
     reset,
     watch,
@@ -62,7 +63,7 @@ export const DrawerCreateEvent: FC = () => {
     }
   }, [eventToEdit, isOpen, reset]);
 
-  const {field: nameField} = useController({
+  const { field: nameField } = useController({
     control,
     name: 'name',
     rules: {
@@ -70,17 +71,17 @@ export const DrawerCreateEvent: FC = () => {
     },
   });
 
-  const {field: eventDescriptionField} = useController({
+  const { field: eventDescriptionField } = useController({
     control,
     name: 'eventDescription',
   });
 
-  const {field: tagsField} = useController({
+  const { field: tagsField } = useController({
     control,
     name: 'tags',
   });
 
-  const {field: schemaField} = useController({
+  const { field: schemaField } = useController({
     control,
     name: 'schema',
   });
@@ -96,12 +97,12 @@ export const DrawerCreateEvent: FC = () => {
   };
 
   const handleSave = (data: EventDTO) => {
-    if (isEditing && eventToEdit) {
+    if (isEditing && eventToEdit && eventId) {
       const updatedEvent = {
         ...eventToEdit,
         ...data,
       };
-      editEvent({id: eventId, updates: updatedEvent});
+      editEvent({ id: eventId, updates: updatedEvent });
     } else {
       addEvent(data);
     }
@@ -114,7 +115,6 @@ export const DrawerCreateEvent: FC = () => {
 
   return (
     <UIKitDrawer
-      size="500px"
       width={500}
       isResizable
       isDestroyOnClose
@@ -124,15 +124,16 @@ export const DrawerCreateEvent: FC = () => {
       title={isEditing ? 'Edit event' : 'New event'}
       customFooter={
         <div className="flex h-[100%] flex-row gap-2 py-2.5">
-          <UIKitButton type="primary" onClick={handleSubmit(handleSave)} style={{borderRadius: '3px'}}>
+          <UIKitButton type="primary" onClick={handleSubmit(handleSave)} style={{ borderRadius: '3px' }}>
             {isEditing ? 'Save' : 'Create'}
           </UIKitButton>
-          <UIKitButton type="default" onClick={handleClose} style={{borderRadius: '3px'}}>
+          <UIKitButton type="default" onClick={handleClose} style={{ borderRadius: '3px' }}>
             Cancel
           </UIKitButton>
         </div>
       }
       classNames={{
+        // @ts-expect-error 'body' is not in type
         body: 'scrollbar',
       }}
     >
@@ -141,7 +142,7 @@ export const DrawerCreateEvent: FC = () => {
           <UIKitInput
             {...nameField}
             className="min-w-[302px] [&>div]:rounded-[3px]"
-            style={{borderRadius: '3px'}}
+            style={{ borderRadius: '3px' }}
             placeholder="Введите значение"
             data-testid="event-drawer-name-input"
           />
@@ -150,7 +151,7 @@ export const DrawerCreateEvent: FC = () => {
           <UIKitTextArea
             {...eventDescriptionField}
             className="min-w-[302px] [&>div]:rounded-[3px]"
-            style={{borderRadius: '3px '}}
+            style={{ borderRadius: '3px ' }}
             placeholder="Enter description"
           />
         </UIKitFormItem>
@@ -158,12 +159,12 @@ export const DrawerCreateEvent: FC = () => {
           <UIKitMultipleSelect
             {...tagsField}
             className="max-h-[32px] min-w-[302px] [&>div]:rounded-[3px]"
-            dropdownStyle={{borderRadius: '3px'}}
+            dropdownStyle={{ borderRadius: '3px' }}
             isAllowClear
             maxTagTextLength={8}
             maxTagCount={2}
             mode="multiple"
-            style={{borderRadius: '3px '}}
+            style={{ borderRadius: '3px ' }}
             options={tagOptions}
             onAddOption={addTag}
             isAddOption
@@ -189,8 +190,8 @@ export const DrawerCreateEvent: FC = () => {
             className="h-fit min-h-[400px]"
             defaultLanguage="json"
             options={{
-              minimap: {enabled: false},
-              stickyScroll: {enabled: false},
+              minimap: { enabled: false },
+              stickyScroll: { enabled: false },
               scrollBeyondLastLine: false,
               wordWrap: 'on',
             }}

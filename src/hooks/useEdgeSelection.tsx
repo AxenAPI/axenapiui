@@ -1,5 +1,5 @@
-import {useUnit} from 'effector-react';
-import {useCallback} from 'react';
+import { useUnit } from 'effector-react';
+import { MouseEvent, useCallback } from 'react';
 
 import {
   $drawerEditLink,
@@ -10,14 +10,13 @@ import {
   addMultipleSelection,
   toggleItemSelection,
 } from '@/components/commons/diagram/model/SelectedItemsModel';
-import {useSingleAndDoubleClick} from '@/hooks/useSingleAndDoubleClick';
-import {LinkDTO} from '@/shared/api/event-graph-api';
+import { useSingleAndDoubleClick } from '@/hooks/useSingleAndDoubleClick';
 
 /**
  * Хук для обработки взаимодействия с ребром графа.
  * Предоставляет состояние связи (выбрана или не выбрана) и обработчики кликов.
  */
-export const useEdgeSelection = (id: LinkDTO['id']) => {
+export const useEdgeSelection = (id: string) => {
   const selectedItems = useUnit($selectedItems);
   const drawerEditLink = useUnit($drawerEditLink);
 
@@ -28,7 +27,7 @@ export const useEdgeSelection = (id: LinkDTO['id']) => {
   }, [id]);
 
   const handleEdgeSelect = useCallback(
-    (event: React.MouseEvent) => {
+    (event?: MouseEvent) => {
       if (event?.ctrlKey || event?.shiftKey) {
         addMultipleSelection(id);
       } else {
@@ -40,5 +39,5 @@ export const useEdgeSelection = (id: LinkDTO['id']) => {
 
   const onEdgeClick = useSingleAndDoubleClick(handleEdgeSelect, handleEdgeDoubleClick);
 
-  return {isEdgeSelected, onEdgeClick};
+  return { isEdgeSelected, onEdgeClick };
 };

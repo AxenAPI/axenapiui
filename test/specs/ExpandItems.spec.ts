@@ -1,10 +1,11 @@
-import {expect, Page} from '@playwright/test';
-
 import path from 'path';
 
-import {EConnectionType} from '../../src/enums/common';
-import {test} from '../electron.fixture';
-import {addEvent, addLink, addService, addTopic, getDiagramState, uploadFile} from '../helpers/diagramHelpers';
+import { expect, Page } from '@playwright/test';
+
+import { EConnectionType } from '@/enums/common';
+
+import { test } from '../electron.fixture';
+import { addEvent, addLink, addService, addTopic, getDiagramState, uploadFile } from '../helpers/diagramHelpers';
 
 const uploadFileWithExpandableItems = async (page: Page) => {
   const filePath = path.join(__dirname, '../mocks/import-files/consume_two_events_in_one_topic.json');
@@ -12,14 +13,14 @@ const uploadFileWithExpandableItems = async (page: Page) => {
 };
 
 test.describe('scenarios for expanding and shrinking topic details', () => {
-  test('should expand and shrink topic details through context menu', async ({page}) => {
+  test('should expand and shrink topic details through context menu', async ({ page }) => {
     // Arrange
     await uploadFileWithExpandableItems(page); // Загружаем файл с "расширяемым" элементом
-    const {edges, eventNodes, expandableEdges, simpleEdges, topicNodes} = await getDiagramState(page);
+    const { edges, eventNodes, expandableEdges, simpleEdges, topicNodes } = await getDiagramState(page);
     const topicNode = topicNodes.first();
 
     // Act: Разворачиваем детали
-    await topicNode.click({button: 'right'});
+    await topicNode.click({ button: 'right' });
     const showEventsBtn = page.locator('text=Show events');
     await showEventsBtn.click();
 
@@ -29,7 +30,7 @@ test.describe('scenarios for expanding and shrinking topic details', () => {
     await expect(edges).toHaveCount(2);
 
     // Act: Сворачиваем детали
-    await topicNode.click({button: 'right'});
+    await topicNode.click({ button: 'right' });
     const hideEventsBtn = page.locator('text=Hide events');
     await hideEventsBtn.click();
 
@@ -40,16 +41,16 @@ test.describe('scenarios for expanding and shrinking topic details', () => {
     await expect(expandableEdges).toHaveCount(1);
   });
 
-  test('should expand and shrink topic details through link double click', async ({page}) => {
+  test('should expand and shrink topic details through link double click', async ({ page }) => {
     // Arrange
     await uploadFileWithExpandableItems(page); // Загружаем файл с "расширяемым" элементом
-    const {edges, eventNodes, expandableEdges, simpleEdges} = await getDiagramState(page);
+    const { edges, eventNodes, expandableEdges, simpleEdges } = await getDiagramState(page);
     await expect(expandableEdges).toHaveCount(1);
     const expandableEdge = expandableEdges.first();
     const simpleEdge = simpleEdges.first();
 
     // Act: Разворачиваем детали по двойному клику на связь
-    await expandableEdge.dblclick({force: true});
+    await expandableEdge.dblclick({ force: true });
 
     // Assert: Детали отображаются и связи обновлены
     await expect(eventNodes).toHaveCount(2);
@@ -57,7 +58,7 @@ test.describe('scenarios for expanding and shrinking topic details', () => {
     await expect(edges).toHaveCount(2);
 
     // Act: Сворачиваем детали по двойному клику на простую связь
-    await simpleEdge.dblclick({force: true});
+    await simpleEdge.dblclick({ force: true });
 
     // Assert: Детали скрыты и связи обновлены
     await expect(eventNodes).toHaveCount(0);
@@ -66,7 +67,7 @@ test.describe('scenarios for expanding and shrinking topic details', () => {
     await expect(expandableEdges).toHaveCount(1);
   });
 
-  test('should properly visualize message production and consumption for a service', async ({page}) => {
+  test('should properly visualize message production and consumption for a service', async ({ page }) => {
     // Arrange: Создаем сервис, топик и события
     await addService(page);
     await addTopic(page);
@@ -78,12 +79,12 @@ test.describe('scenarios for expanding and shrinking topic details', () => {
     await addLink(page, 'Event2', EConnectionType.PRODUCE);
 
     // Assert: Проверяем количество расширяемых связей
-    const {edges, expandableEdges, simpleEdges, topicNodes} = await getDiagramState(page);
+    const { edges, expandableEdges, simpleEdges, topicNodes } = await getDiagramState(page);
     await expect(expandableEdges).toHaveCount(1);
 
     // Act: Открываем детали топика
     const topicNode = topicNodes.first();
-    await topicNode.click({button: 'right'});
+    await topicNode.click({ button: 'right' });
     const detailOption = page.locator('text=Show events');
     await detailOption.click();
 
@@ -92,7 +93,7 @@ test.describe('scenarios for expanding and shrinking topic details', () => {
     await expect(simpleEdges).toHaveCount(1);
   });
 
-  test('should not show details expansion when only one interaction type exists', async ({page}) => {
+  test('should not show details expansion when only one interaction type exists', async ({ page }) => {
     // Arrange: Создаем сервис, топик и событие
     await addService(page);
     await addTopic(page);
@@ -102,13 +103,13 @@ test.describe('scenarios for expanding and shrinking topic details', () => {
     await addLink(page, 'Event1', EConnectionType.CONSUME);
 
     // Assert: Проверяем количество связей
-    const {edges, expandableEdges, topicNodes} = await getDiagramState(page);
+    const { edges, expandableEdges, topicNodes } = await getDiagramState(page);
     await expect(edges).toHaveCount(1);
     await expect(expandableEdges).toHaveCount(0);
 
     // Act: Открываем детали топика
     const topicNode = topicNodes.first();
-    await topicNode.click({button: 'right'});
+    await topicNode.click({ button: 'right' });
 
     // Assert: Убеждаемся, что кнопки для "раскрытия" топика нет
     const detailOption = page.locator('text=Show events');

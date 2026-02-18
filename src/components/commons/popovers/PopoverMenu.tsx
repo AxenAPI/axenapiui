@@ -1,11 +1,11 @@
-import {Menu, Popover} from '@axenix/ui-kit';
-import {ItemType} from 'antd/lib/menu/interface';
-import {useUnit} from 'effector-react';
-import {FC, ReactNode} from 'react';
+import { Menu, Popover } from '@axenix/ui-kit';
+import { ItemType } from 'antd/lib/menu/interface';
+import { useUnit } from 'effector-react';
+import { FC, ReactNode } from 'react';
 
-import {$eventGraph} from '@/models/EventGraphModel';
+import { $eventGraph } from '@/models/EventGraphModel';
 
-import {$popoverMenu, closePopoverMenu} from '../diagram/model/modals-models/popover/PopoverMenuModel';
+import { $popoverMenu, closePopoverMenu } from '../diagram/model/modals-models/popover/PopoverMenuModel';
 
 interface IPopoverMenuProps {
   items: ItemType[];
@@ -13,11 +13,11 @@ interface IPopoverMenuProps {
   popoverId: string;
 }
 
-export const PopoverMenu: FC<IPopoverMenuProps> = ({children, items, popoverId}) => {
+export const PopoverMenu: FC<IPopoverMenuProps> = ({ children, items, popoverId }) => {
   const eventGraph = useUnit($eventGraph);
   const popoverMenu = useUnit($popoverMenu);
 
-  const {isOpen, itemId} = popoverMenu;
+  const { isOpen, itemId } = popoverMenu;
 
   const nodes = eventGraph?.nodes || [];
   const currentNode = itemId ? nodes?.find(item => item && item.id === itemId) : null;
@@ -33,7 +33,7 @@ export const PopoverMenu: FC<IPopoverMenuProps> = ({children, items, popoverId})
       // TODO: найти способ поменять padding контейнера контента
       maxWidth={168}
       minWidth={168}
-      content={<Menu items={items} style={{maxWidth: '160px', borderRight: 'none'}} />}
+      content={<Menu items={items} />}
       onOpenChange={open => {
         if (!open) {
           handleClose();

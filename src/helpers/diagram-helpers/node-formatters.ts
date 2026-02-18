@@ -1,9 +1,10 @@
-import {EMPTY_ARRAY} from '@/constants/common';
-import {GROUP_NODE_GAP, GROUP_NODE_PADDING, INITIAL_POSITION_INSIDE_GROUP, NODE_HEIGHT} from '@/constants/diagram';
-import {ENodeTypes} from '@/enums/common';
-import {generateBaseGroupNodeId, getExpandedEventNodeId} from '@/helpers/node-helpers';
-import {EventDTO, NodeDTO} from '@/shared/api/event-graph-api';
-import {TCustomNode, TGroupNode, TNode, TOptionalPosition} from '@/types/common';
+import { EventDTO, NodeDTO } from '@shared/openapi';
+
+import { EMPTY_ARRAY } from '@/constants/common';
+import { GROUP_NODE_GAP, GROUP_NODE_PADDING, INITIAL_POSITION_INSIDE_GROUP, NODE_HEIGHT } from '@/constants/diagram';
+import { ENodeTypes } from '@/enums/common';
+import { generateBaseGroupNodeId, getExpandedEventNodeId } from '@/helpers/node-helpers';
+import { TCustomNode, TGroupNode, TNode, TOptionalPosition } from '@/types/common';
 
 // TODO покрыть тестами
 /**

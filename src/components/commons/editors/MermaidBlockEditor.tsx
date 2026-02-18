@@ -1,30 +1,40 @@
-import {CodeBlockEditorProps} from '@mdxeditor/editor';
+import { CodeBlockEditorProps, useCodeBlockEditorContext } from '@mdxeditor/editor';
 import mermaid from 'mermaid';
-import {FC, useEffect, useRef} from 'react';
+import { FC, ReactNode, useEffect, useRef } from 'react';
 
-export const MermaidBlockEditor: FC<CodeBlockEditorProps> = props => {
-  const containerRef = useRef<HTMLDivElement>(null);
+import { DiagramBlock } from '@/components/commons/editors/DiagramBlock';
+import { DEFAULT_MERMAID_CODE } from '@/constants/diagramTemplates';
 
-  const text = props.code ?? '';
+import { SafeSVG } from './SafeSVG';
 
+type MermaidBlockEditorProps = CodeBlockEditorProps & {
+  isCanEdit?: boolean;
+};
+
+const renderMermaid = async (code: string): Promise<ReactNode> => {
+  const id = `mermaid-${Date.now()}`;
+  const { svg } = await mermaid.render(id, code);
+  return <SafeSVG svgString={svg} />;
+};
+
+export const MermaidBlockEditor: FC<MermaidBlockEditorProps> = ({ isCanEdit = false, ...props }) => {
+  const { setCode } = useCodeBlockEditorContext();
+  const isInitRef = useRef(true);
+  // Применяем шаблон, если code пустой в новом блоке
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!props.code?.trim() && isInitRef.current) {
+      setCode(DEFAULT_MERMAID_CODE);
+    }
+    isInitRef.current = false;
+  }, [props.code, setCode, isInitRef]);
 
-    const id = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
-
-    mermaid
-      .render(id, text)
-      .then(result => {
-        if (containerRef.current) {
-          containerRef.current.innerHTML = result.svg;
-        }
-      })
-      .catch(error => {
-        if (containerRef.current) {
-          containerRef.current.innerHTML = `<pre style="color:red">${error.message}</pre>`;
-        }
-      });
-  }, [text]);
-
-  return <div ref={containerRef} />;
+  return (
+    <DiagramBlock
+      code={props.code}
+      type="mermaid"
+      renderDiagram={renderMermaid}
+      setCode={setCode}
+      isCanEdit={isCanEdit}
+    />
+  );
 };

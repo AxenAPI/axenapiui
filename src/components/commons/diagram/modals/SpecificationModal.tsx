@@ -1,12 +1,17 @@
-import {Drawer, NodeSkeleton, Row, Button as UIKitButton, Col} from '@axenix/ui-kit';
-import {Editor} from '@monaco-editor/react';
-import {AxiosResponse} from 'axios';
-import {useUnit} from 'effector-react';
+import { Button as UIKitButton, Col, Drawer, NodeSkeleton, Row } from '@axenix/ui-kit';
+import { Editor } from '@monaco-editor/react';
+import { useUnit } from 'effector-react';
 import yaml from 'js-yaml';
-import {FC, useEffect, useState} from 'react';
+import { FC, useEffect, useState } from 'react';
 import SwaggerUI from 'swagger-ui-react';
 
-import {RadioButtonGroup} from '@/components/commons/buttons/RadioGroupButton';
+import {
+  EventGraphDTO,
+  GetServiceSpecificationPost200Response,
+  GetServiceSpecificationPostRequest,
+} from '@shared/openapi';
+
+import { RadioButtonGroup } from '@/components/commons/buttons/RadioGroupButton';
 import {
   FORMAT_OPTIONS,
   SPECIFICATION_OPTIONS,
@@ -19,19 +24,18 @@ import {
   fetchServiceSpecificationFx,
   updateServiceSpecification,
 } from '@/components/commons/diagram/model/modals-models/drawer-specification/SpecificationModalModel';
-import {EMPTY_CHAR} from '@/constants/common';
-import {$eventGraph, setEventGraph} from '@/models/EventGraphModel';
-import {GetServiceSpecificationPost200Response, GetServiceSpecificationPostRequest} from '@/shared/api/event-graph-api';
+import { EMPTY_CHAR } from '@/constants/common';
+import { $eventGraph, setEventGraph } from '@/models/EventGraphModel';
 import 'swagger-ui-react/swagger-ui.css';
 
 type EditorFormat = 'json' | 'yaml';
 
 export const SpecificationModal: FC = () => {
   const editSpecificationModal = useUnit($specificationModal);
-  const {isOpen, nodeId} = editSpecificationModal;
+  const { isOpen, nodeId } = editSpecificationModal;
   const eventGraph = useUnit($eventGraph);
   const [specificationResponse, setSpecificationResponse] =
-    useState<AxiosResponse<GetServiceSpecificationPost200Response>>(specificationDataInitialState);
+    useState<GetServiceSpecificationPost200Response>(specificationDataInitialState);
 
   const [editedSpecification, setEditedSpecification] = useState<string>(EMPTY_CHAR);
   const [selectedView, setSelectedView] = useState<SPECIFICATION_VIEW>(SPECIFICATION_VIEW.FULL);
@@ -55,15 +59,15 @@ export const SpecificationModal: FC = () => {
 
       updateServiceSpecification({
         eventGraph,
-        serviceNodeId: specificationResponse.data.serviceNodeId,
+        serviceNodeId: specificationResponse?.serviceNodeId ?? '',
         specification: jsonSpecification,
-      }).then(result => {
-        setEventGraph(result.data);
+      }).then((result: EventGraphDTO) => {
+        setEventGraph(result);
       });
 
       closeSpecificationModal();
     } catch (error) {
-      throw new Error('Ошибка при сохранении спецификации: неверный формат данных', error);
+      throw new Error(`Ошибка при сохранении спецификации: неверный формат данных - ${String(error)}`);
     }
   };
 
@@ -99,7 +103,7 @@ export const SpecificationModal: FC = () => {
         setEditorFormat('json');
       }
     } catch (error) {
-      throw new Error(`Ошибка конвертации между JSON и YAML: ${(error as Error).message}`);
+      throw new Error(`Ошибка конвертации между JSON и YAML: ${(error as Error)?.message ?? String(error)}`);
     }
   };
 
@@ -107,13 +111,17 @@ export const SpecificationModal: FC = () => {
     if (!eventGraph || !nodeId) {
       return;
     }
-    const request: GetServiceSpecificationPostRequest = {serviceNodeId: nodeId, eventGraph};
+    const request: GetServiceSpecificationPostRequest = { serviceNodeId: nodeId, eventGraph };
     fetchServiceSpecificationFx(request).then(result => {
       setSpecificationResponse(result);
       try {
-        // Парсим JSON для редактора в json-формате по-умолчанию
-        setEditedSpecification(JSON.stringify(JSON.parse(result?.data.specification), null, 2));
-        setEditorFormat('json');
+        if (result?.specification) {
+          // Парсим JSON для редактора в json-формате по-умолчанию
+          setEditedSpecification(JSON.stringify(JSON.parse(result.specification), null, 2));
+          setEditorFormat('json');
+        } else {
+          throw new Error('Specification is empty');
+        }
       } catch {
         setSpecificationResponse(specificationDataInitialState);
         setEditedSpecification(EMPTY_CHAR);
@@ -134,21 +142,21 @@ export const SpecificationModal: FC = () => {
     <Drawer
       title="Service specification"
       isOpen={isOpen}
-      onClose={closeSpecificationModal}
+      onClose={() => closeSpecificationModal()}
       placement="right"
-      size="1500px"
       width={1500}
       customFooter={
         <div className="flex h-[100%] flex-row gap-2 py-2.5">
-          <UIKitButton type="primary" onClick={handleSave} style={{borderRadius: '3px'}}>
+          <UIKitButton type="primary" onClick={handleSave} style={{ borderRadius: '3px' }}>
             Save
           </UIKitButton>
-          <UIKitButton type="default" onClick={handleClose} style={{borderRadius: '3px'}}>
+          <UIKitButton type="default" onClick={handleClose} style={{ borderRadius: '3px' }}>
             Cancel
           </UIKitButton>
         </div>
       }
       classNames={{
+        // @ts-expect-error 'body' is not in type
         body: 'scrollbar',
       }}
     >
@@ -156,24 +164,28 @@ export const SpecificationModal: FC = () => {
         <RadioButtonGroup
           options={FORMAT_OPTIONS}
           value={editorFormat}
-          onChange={(val: 'json' | 'yaml') => handleFormatSwitch(val)}
+          onChange={val => handleFormatSwitch(val as 'json' | 'yaml')}
         />
-        <RadioButtonGroup options={SPECIFICATION_OPTIONS} value={selectedView} onChange={handleTypeSelect} />
+        <RadioButtonGroup
+          options={SPECIFICATION_OPTIONS}
+          value={selectedView}
+          onChange={val => handleTypeSelect(val as SPECIFICATION_VIEW)}
+        />
       </Row>
 
       <Row wrap={false} className="h-full" gutter={16}>
         {[SPECIFICATION_VIEW.EDITOR, SPECIFICATION_VIEW.FULL].includes(selectedView) && (
           <Col flex={selectedView === SPECIFICATION_VIEW.FULL ? '0 0 50%' : '1 1 100%'}>
             <Editor
-              key={specificationResponse.data.serviceNodeId + editorFormat}
+              key={specificationResponse.serviceNodeId + editorFormat}
               loading={<NodeSkeleton className="h-[100px] w-full" isActive />}
               className="h-full min-h-[529px] w-full rounded border border-[#D9D9D9]"
               value={editedSpecification}
               language={editorFormat === 'json' ? 'json' : 'yaml'}
               onChange={handleSpecificationChange}
               options={{
-                minimap: {enabled: false},
-                stickyScroll: {enabled: false},
+                minimap: { enabled: false },
+                stickyScroll: { enabled: false },
                 scrollBeyondLastLine: false,
                 wordWrap: 'on',
               }}
@@ -187,6 +199,8 @@ export const SpecificationModal: FC = () => {
                 try {
                   const spec =
                     editorFormat === 'json' ? JSON.parse(editedSpecification) : yaml.load(editedSpecification);
+                  // @ts-expect-error Временное решение до миграции на swagger-ui-react@5, где возможно исправлены
+                  // проблемы с типами React
                   return <SwaggerUI spec={spec} />;
                 } catch {
                   return <p className="p-4 text-red-500">Неверный формат спецификации</p>;

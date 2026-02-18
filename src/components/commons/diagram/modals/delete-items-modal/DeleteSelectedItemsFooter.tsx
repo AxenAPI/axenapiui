@@ -1,4 +1,4 @@
-import {Button} from '@axenix/ui-kit';
+import { Button } from '@axenix/ui-kit';
 
 interface IDeleteSelectedItemsModalFooter {
   onClose: () => void;

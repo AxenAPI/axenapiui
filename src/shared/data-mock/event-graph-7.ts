@@ -1,4 +1,4 @@
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO } from '@shared/openapi';
 
 export const EventGraph7: EventGraphDTO = {
   name: 'service_no_common_consume_topics_common_events_common_outgoing_topics_1',
@@ -9,7 +9,7 @@ export const EventGraph7: EventGraphDTO = {
       belongsToGraph: ['12345678-90ab-cdef-1234-567890abcdef'],
       name: 'service_no_common_consume_topics_common_events_common_outgoing_topics_1',
       type: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
     },
     {
       id: 'b2c3d4e5-f678-9012-3456-7890abcdef03',
@@ -56,32 +56,38 @@ export const EventGraph7: EventGraphDTO = {
   ],
   links: [
     {
+      id: 'link-g7-1',
       fromId: '12345678-90ab-cdef-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef09',
       eventId: 'c3d4e5f6-7890-1234-5678-90abcdef012a',
     },
     {
+      id: 'link-g7-2',
       fromId: '12345678-90ab-cdef-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef10',
       eventId: 'ee6e6872-671b-4a4e-ace8-6f12a01bcbec',
     },
     {
+      id: 'link-g7-3',
       fromId: '12345678-90ab-cdef-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef11',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde1',
     },
     {
+      id: 'link-g7-4',
       toId: '12345678-90ab-cdef-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef03',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde2',
       group: 'group1',
     },
     {
+      id: 'link-g7-5',
       toId: '12345678-90ab-cdef-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef05',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde3',
     },
     {
+      id: 'link-g7-6',
       toId: '12345678-90ab-cdef-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef07',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcde4',

@@ -1,12 +1,12 @@
-import {createEffect, createEvent, createStore} from 'effector';
+import { createEffect, createEvent, createStore } from 'effector';
 
-import {apiClient} from '@/shared/api/client';
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { DocumentationService } from '@shared/api/services';
+import { EventGraphDTO } from '@shared/openapi';
 
 export const openDrawerExport = createEvent();
 export const closeDrawerExport = createEvent();
 
-export const $drawerExport = createStore<{isOpen: boolean}>({
+export const $drawerExport = createStore<{ isOpen: boolean }>({
   isOpen: false,
 })
   .on(openDrawerExport, () => ({
@@ -17,10 +17,8 @@ export const $drawerExport = createStore<{isOpen: boolean}>({
 // Асинхронный эффект для получения ссылок для скачивания спецификаций
 export const fetchExportLinksFx = createEffect(async (eventGraphDTO: EventGraphDTO) => {
   try {
-    const response = await apiClient.generateSpecPost({eventGraphDTO});
-
-    return response.data;
+    return await DocumentationService.generateSpec(eventGraphDTO);
   } catch (e) {
-    throw new Error(e);
+    throw new Error(e instanceof Error ? e.message : 'An unknown error occurred');
   }
 });

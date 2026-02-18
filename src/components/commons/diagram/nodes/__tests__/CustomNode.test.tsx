@@ -1,62 +1,83 @@
-import {render, screen, fireEvent} from '@testing-library/react';
-import {ReactFlowProvider} from '@xyflow/react';
-import {fork, allSettled, createWatch} from 'effector';
-import {Provider} from 'effector-react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { ReactFlowProvider } from '@xyflow/react';
+import { allSettled, createWatch, fork } from 'effector';
+import { Provider } from 'effector-react';
 
-import {toggleItemSelection} from '@/components/commons/diagram/model/SelectedItemsModel';
-import {CustomNode} from '@/components/commons/diagram/nodes/CustomNode';
-import {NodeSelectedColorMap} from '@/helpers/nodes-value-map';
-import {editNode} from '@/models/EventGraphModel';
-import {NodeDTOBrokerTypeEnum, NodeDTOTypeEnum} from '@/shared/api/event-graph-api';
-import {TCustomNodeData} from '@/types/common';
+import { NodeDTOBrokerTypeEnum, NodeDTOTypeEnum } from '@shared/openapi';
+
+import { toggleItemSelection } from '@/components/commons/diagram/model/SelectedItemsModel';
+import { CustomNode, ICustomNodeProps } from '@/components/commons/diagram/nodes/ui/CustomNode';
+import { NodeSelectedColorMap } from '@/helpers/nodes-value-map';
+import { editNode } from '@/models/EventGraphModel';
+
+const defaultMockProps: ICustomNodeProps = {
+  id: 'test-node-id',
+  type: 'custom',
+  data: { name: 'test', nodeType: NodeDTOTypeEnum.Service },
+  selected: false,
+  dragging: false,
+  draggable: true,
+  selectable: true,
+  deletable: true,
+  zIndex: 0,
+  isConnectable: true,
+  positionAbsoluteX: 0,
+  positionAbsoluteY: 0,
+};
 
 const testCases = [
   {
     name: 'SERVICE node',
-    data: {
-      name: 'consume_one_event_service',
-      nodeType: NodeDTOTypeEnum.Service,
+    props: {
+      data: {
+        name: 'consume_one_event_service',
+        nodeType: NodeDTOTypeEnum.Service,
+      },
     },
     expectedTestId: 'serviceNode',
   },
   {
     name: 'TOPIC node',
-    data: {
-      name: 'topic1',
-      nodeType: NodeDTOTypeEnum.Topic,
-      brokerType: NodeDTOBrokerTypeEnum.Kafka,
+    props: {
+      data: {
+        name: 'topic1',
+        nodeType: NodeDTOTypeEnum.Topic,
+        brokerType: NodeDTOBrokerTypeEnum.Kafka,
+      },
     },
     expectedTestId: 'topicNode',
   },
   {
     name: 'HTTP node',
-    data: {
-      name: 'http',
-      nodeType: NodeDTOTypeEnum.Http,
+    props: {
+      data: {
+        name: 'http',
+        nodeType: NodeDTOTypeEnum.Http,
+      },
     },
     expectedTestId: 'httpNode',
   },
 ];
 
 describe('/src/components/diagram/CustomNode.tsx', () => {
-  const renderCustomNode = (data: TCustomNodeData, id = 'test-node-id') =>
+  const renderCustomNode = (props: Partial<ICustomNodeProps> = {}) =>
     render(
       <ReactFlowProvider>
         <Provider value={fork()}>
-          <CustomNode data={data} id={id} />
+          <CustomNode {...defaultMockProps} {...props} />
         </Provider>
       </ReactFlowProvider>
     );
 
   // Тестирование рендеринга для каждого типа узла
-  test.each(testCases)('renders node correctly', ({data, expectedTestId}) => {
-    renderCustomNode(data);
+  test.each(testCases)('renders node correctly', ({ expectedTestId, props }) => {
+    renderCustomNode(props);
 
     // Проверяем, что основные элементы узла отрендерены корректно:
     // - Основной контейнер узла (например, serviceNode, topicNode)
     // - Поле с именем узла, которое должно содержать правильное значение
     expect(screen.getByTestId(expectedTestId)).toBeInTheDocument();
-    expect(screen.getByTestId(`${expectedTestId}Name`)).toHaveValue(data.name);
+    expect(screen.getByTestId(`${expectedTestId}Name`)).toHaveValue(props.data.name);
 
     // Проверяем, что хэндлы (source и target) для соединений отрендерены
     expect(screen.getByTestId('nodeSource')).toBeInTheDocument();
@@ -83,7 +104,7 @@ describe('/src/components/diagram/CustomNode.tsx', () => {
       scope,
     });
 
-    renderCustomNode(testCases[0].data);
+    renderCustomNode(testCases[0].props);
 
     const nodeElement = screen.getByTestId('serviceNode');
 
@@ -132,7 +153,7 @@ describe('/src/components/diagram/CustomNode.tsx', () => {
       scope,
     });
 
-    renderCustomNode(testCases[0].data); // Используем SERVICE узел для тестирования
+    renderCustomNode(testCases[0].props); // Используем SERVICE узел для тестирования
 
     const nodeNameInput = screen.getByTestId('serviceNodeName');
 
@@ -140,7 +161,7 @@ describe('/src/components/diagram/CustomNode.tsx', () => {
     fireEvent.dblClick(nodeNameInput);
 
     // Изменяем значение поля ввода и вызываем blur для сохранения изменений
-    fireEvent.change(nodeNameInput, {target: {value: 'Updated Name'}});
+    fireEvent.change(nodeNameInput, { target: { value: 'Updated Name' } });
     fireEvent.blur(nodeNameInput);
 
     // Проверяем, что событие editNode было вызвано с правильными параметрами
@@ -148,13 +169,13 @@ describe('/src/components/diagram/CustomNode.tsx', () => {
       scope,
       params: {
         id: 'test-node-id',
-        updates: {name: 'Updated Name'},
+        updates: { name: 'Updated Name' },
       },
     });
 
     expect(mockEditNode).toHaveBeenCalledWith({
       id: 'test-node-id',
-      updates: {name: 'Updated Name'},
+      updates: { name: 'Updated Name' },
     });
 
     // Очищаем слушатель после завершения теста
@@ -185,7 +206,7 @@ describe('/src/components/diagram/CustomNode.tsx', () => {
     render(
       <ReactFlowProvider>
         <Provider value={scope}>
-          <CustomNode data={testCases[0].data} id="test-node-id" />
+          <CustomNode {...defaultMockProps} {...testCases[0].props} id="test-node-id" />
         </Provider>
       </ReactFlowProvider>
     );
@@ -194,7 +215,7 @@ describe('/src/components/diagram/CustomNode.tsx', () => {
     const nodeElement = screen.getByTestId('serviceNode');
 
     // Определяем ожидаемый класс Tailwind для выделенного состояния
-    const expectedClass = NodeSelectedColorMap[testCases[0].data.nodeType];
+    const expectedClass = NodeSelectedColorMap[testCases[0].props.data.nodeType];
 
     // Проверяем, что к элементу применен правильный класс для выделенного состояния
     expect(nodeElement).toHaveClass(expectedClass);

@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "types": ["electron-vite/node", "node", "jest"],
+    "lib": ["ESNext", "ES2023"],
+    "paths": {
+      "@common/*": ["common/*"],
+      "@packageJson": ["package.json"]
+    }
+  },
+  "include": [
+    "electron.vite.config.ts",
+    "electron/**/*",
+    "openapi/**/*.ts",
+    "scripts/**/*.ts",
+    "common/**/*.ts",
+    "*.config.ts",
+    "*.config.js",
+    "*.cjs",
+    "jest.*.ts",
+    "common/declarations/*.d.ts",
+    "package.json"
+  ],
+  "exclude": ["build-scripts/**"]
+}

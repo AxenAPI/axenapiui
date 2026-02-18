@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 
 export const useSingleAndDoubleClick = (
-  actionSimpleClick: (event?: React.MouseEvent) => void,
-  actionDoubleClick: (event?: React.MouseEvent) => void,
+  actionSimpleClick: (event?: MouseEvent) => void,
+  actionDoubleClick: (event?: MouseEvent) => void,
   delay = 250
 ) => {
   const [click, setClick] = useState(0);
-  const [lastEvent, setLastEvent] = useState<React.MouseEvent | null>(null);
+  const [lastEvent, setLastEvent] = useState<MouseEvent | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,7 +25,7 @@ export const useSingleAndDoubleClick = (
     return () => clearTimeout(timer);
   }, [actionDoubleClick, actionSimpleClick, click, delay, lastEvent]);
 
-  return (event?: React.MouseEvent) => {
+  return (event?: MouseEvent) => {
     setLastEvent(event || null);
     setClick(prev => prev + 1);
   };

@@ -1,5 +1,5 @@
-import {isSchemaObject} from '@/helpers/json-editor';
-import {TSchema} from '@/types/common';
+import { isSchemaObject } from '@/helpers/json-editor';
+import { TSchema } from '@/types/common';
 
 // TODO добавить тест
 /**
@@ -41,9 +41,9 @@ export function addOrUpdateNestedSchema(schema: TSchema, nestedSchema: TSchema, 
 
     return {
       ...currentSchema,
-      [currentKey]: updateSchema({...(nextSchema as Record<string, unknown>)}, restPath),
+      [currentKey]: updateSchema({ ...(nextSchema as Record<string, unknown>) }, restPath),
     };
   };
 
-  return updateSchema({...schema}, path) as TSchema;
+  return updateSchema({ ...schema }, path) as TSchema;
 }

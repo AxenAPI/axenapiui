@@ -1,19 +1,20 @@
-import {BaseEdge, EdgeLabelRenderer, getBezierPath, type EdgeProps} from '@xyflow/react';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
 import clsx from 'clsx';
-import {useUnit} from 'effector-react';
-import React, {type FC, useCallback} from 'react';
+import { useUnit } from 'effector-react';
+import { useCallback } from 'react';
 
-import {expandItemByTopicId} from '@/components/commons/diagram/model/ExpandableItemsModel';
-import {getArrowAngle} from '@/helpers/diagram-helpers/edge-helpers';
-import {useSingleAndDoubleClick} from '@/hooks/useSingleAndDoubleClick';
-import {CircleDoubleArrow} from '@/shared/ui/icons';
-import type {TExpandableItem} from '@/types/common';
+import { CircleDoubleArrow } from '@shared/ui/icons';
 
-import {$hiddenItems} from '../model/HiddenItemsModel';
+import { expandItemByTopicId } from '@/components/commons/diagram/model/ExpandableItemsModel';
+import type { TEdgeProps } from '@/constants/reactflow';
+import { getArrowAngle } from '@/helpers/diagram-helpers/edge-helpers';
+import { useSingleAndDoubleClick } from '@/hooks/useSingleAndDoubleClick';
 
-export type IExpandableEdgeProps = Partial<EdgeProps & {data: TExpandableItem}>;
+import { $hiddenItems } from '../model/HiddenItemsModel';
 
-export const ExpandableEdge: FC<IExpandableEdgeProps> = ({
+export type IExpandableEdgeProps = TEdgeProps;
+
+export function ExpandableEdge({
   data,
   id,
   sourcePosition,
@@ -22,7 +23,7 @@ export const ExpandableEdge: FC<IExpandableEdgeProps> = ({
   targetPosition,
   targetX,
   targetY,
-}) => {
+}: IExpandableEdgeProps) {
   const hiddenItems = useUnit($hiddenItems);
 
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -34,7 +35,7 @@ export const ExpandableEdge: FC<IExpandableEdgeProps> = ({
     targetPosition,
   });
 
-  const angle = getArrowAngle({targetY, sourceY, targetX, sourceX});
+  const angle = getArrowAngle({ targetY, sourceY, targetX, sourceX });
 
   // TODO не работает
   const hidden = hiddenItems.includes(data.eventId as string);
@@ -46,7 +47,7 @@ export const ExpandableEdge: FC<IExpandableEdgeProps> = ({
   const onEdgeClick = useSingleAndDoubleClick(() => {}, handleEdgeDoubleClick);
 
   return (
-    <React.Fragment>
+    <>
       <g onClick={onEdgeClick} data-testid="expandable-edge">
         <BaseEdge
           id={id}
@@ -72,6 +73,6 @@ export const ExpandableEdge: FC<IExpandableEdgeProps> = ({
           </div>
         </EdgeLabelRenderer>
       </g>
-    </React.Fragment>
+    </>
   );
-};
+}

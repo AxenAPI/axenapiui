@@ -30,7 +30,7 @@ coverage
 .lock-wscript
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
+build/
 
 # Dependency directories
 node_modules/
@@ -53,16 +53,23 @@ typings/
 
 # Output of 'npm pack'
 *.tgz
+!/local-packages/*.tgz
 
 # Yarn Integrity file
 .yarn-integrity
 
 # dotenv environment variables file
 # .env // TODO: потом вернуть
+.env.local
+.env.loc
 .env.test
+release.env
 
 # Webpack
 .webpack/
+
+# Vite
+.vite/
 
 # Electron-Forge
 out/
@@ -74,18 +81,34 @@ out/
 
 # Editors
 .idea/
-.qodo
-
-.qodo
+.qodo/
+.vscode/
 
 # Ignore Playwright test results
 test/test-results/
 
 # H2
-data/*
+data/
 
 # stryker temp files
 .stryker-tmp
 
 # output
 dist
+
+# openapi
+src/shared/openapi/
+openapi/*.yaml
+openapi/*.yml
+openapi/.version-schema
+openapi/.version-generated
+
+# jar files
+jar-files/*.jar
+jar-files/.version-jar
+
+# local file
+prompt.md
+
+# cache
+.cache

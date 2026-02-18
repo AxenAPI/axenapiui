@@ -1,14 +1,15 @@
-import {GROUP_NODE_PADDING, NODE_HEIGHT, NODE_WIDTH} from '@/constants/diagram';
-import {ENodeTypes} from '@/enums/common';
+import { Consume2Events1Topic } from '@shared/data-mock';
+
+import { GROUP_NODE_PADDING, NODE_HEIGHT, NODE_WIDTH } from '@/constants/diagram';
+import { ENodeTypes } from '@/enums/common';
 import {
   expandableItemMockConsume2Events1Topic,
   expandedItemMockConsume2Events1Topic,
 } from '@/helpers/adapters/__tests__/data';
 import * as utils from '@/helpers/utils';
-import {Consume2Events1Topic} from '@/shared/data-mock';
-import {TNode} from '@/types/common';
+import { TNode } from '@/types/common';
 
-import {applyLayout} from '../apply-layout';
+import { applyLayout } from '../apply-layout';
 
 const mockEventGraph = Consume2Events1Topic;
 const mockNodeWidth = NODE_WIDTH;
@@ -31,7 +32,7 @@ jest.mock('@/helpers/node-helpers', () => {
 
 // Мокируем elkjs как модуль
 jest.mock('elkjs/lib/elk.bundled.js', () => {
-  const {calculateGroupDimensions, generateBaseGroupNodeId, getExpandedEventNodeId} =
+  const { calculateGroupDimensions, generateBaseGroupNodeId, getExpandedEventNodeId } =
     jest.requireMock('@/helpers/node-helpers');
 
   return class {
@@ -84,7 +85,7 @@ describe('/src/helpers/adapters/applyLayout.tsx', () => {
   });
 
   test('should handle empty inputs', async () => {
-    const result = await applyLayout({nodes: [], links: [], events: []});
+    const result = await applyLayout({ name: 'empty', nodes: [], links: [], events: [], tags: [], errors: [] });
 
     expect(result.nodes).toHaveLength(0);
     expect(result.edges).toHaveLength(0);
@@ -97,8 +98,8 @@ describe('/src/helpers/adapters/applyLayout.tsx', () => {
     expect(result.nodes).toHaveLength(2);
     expect(result.edges).toHaveLength(1);
 
-    expect(result.nodes[0].position).toEqual({x: 100, y: 100});
-    expect(result.nodes[1].position).toEqual({x: 300, y: 200});
+    expect(result.nodes[0].position).toEqual({ x: 100, y: 100 });
+    expect(result.nodes[1].position).toEqual({ x: 300, y: 200 });
   });
 
   test('should return correct nodes with calculated position when expandable item is open', async () => {
@@ -110,7 +111,7 @@ describe('/src/helpers/adapters/applyLayout.tsx', () => {
         brokerType: 'KAFKA',
       },
       type: 'custom',
-      position: {x: 300, y: 200},
+      position: { x: 300, y: 200 },
     } as TNode;
 
     // Проверям на графе с раскрывающимися элементами, но в открытом состоянии
@@ -127,28 +128,28 @@ describe('/src/helpers/adapters/applyLayout.tsx', () => {
     const groupNode = resultExpanded.nodes.find(el => el.type === ENodeTypes.GROUP);
     const expandedEvents = resultExpanded.nodes.filter(el => el.type === ENodeTypes.EXPANDED_EVENT);
 
-    expect(customNodes[0].position).toEqual({x: 100, y: 100});
-    expect(groupNode.position).toEqual({
+    expect(customNodes[0].position).toEqual({ x: 100, y: 100 });
+    expect(groupNode!.position).toEqual({
       x: existingExpandableTopic.position.x - GROUP_NODE_PADDING,
       y: existingExpandableTopic.position.y - GROUP_NODE_PADDING,
     });
-    expect(customNodes[1].position).toEqual({x: 10, y: 10});
-    expect(expandedEvents[0].position).toEqual({x: 10, y: 78});
-    expect(expandedEvents[1].position).toEqual({x: 10, y: 146});
+    expect(customNodes[1].position).toEqual({ x: 10, y: 10 });
+    expect(expandedEvents[0].position).toEqual({ x: 10, y: 78 });
+    expect(expandedEvents[1].position).toEqual({ x: 10, y: 146 });
   });
 
   test('should save existing nodes position', async () => {
     const existingNodes: TNode[] = [
       {
         id: Consume2Events1Topic.nodes[0].id,
-        position: {x: 50, y: 50},
-        data: {name: 'existing node', nodeType: 'SERVICE'},
+        position: { x: 50, y: 50 },
+        data: { name: 'existing node', nodeType: 'SERVICE' },
       },
     ];
 
     const result = await applyLayout(Consume2Events1Topic, existingNodes, [expandableItemMockConsume2Events1Topic]);
 
-    expect(result.nodes[0].position).toEqual({x: 50, y: 50});
+    expect(result.nodes[0].position).toEqual({ x: 50, y: 50 });
   });
 
   test('should use window.elk in desktop mode', async () => {
@@ -181,7 +182,7 @@ describe('/src/helpers/adapters/applyLayout.tsx', () => {
     const result = await applyLayout(Consume2Events1Topic, [], [expandableItemMockConsume2Events1Topic]);
 
     expect(mockElkLayout).toHaveBeenCalled();
-    expect(result.nodes[0].position).toEqual({x: 100, y: 100});
-    expect(result.nodes[1].position).toEqual({x: 300, y: 200});
+    expect(result.nodes[0].position).toEqual({ x: 100, y: 100 });
+    expect(result.nodes[1].position).toEqual({ x: 300, y: 200 });
   });
 });

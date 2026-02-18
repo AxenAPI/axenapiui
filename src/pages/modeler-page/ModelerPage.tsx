@@ -1,8 +1,8 @@
-import {ReactFlowProvider} from '@xyflow/react';
-import {FC} from 'react';
+import { ReactFlowProvider } from '@xyflow/react';
+import { FC } from 'react';
 
-import {Diagram} from '@/components/commons/diagram/Diagram';
-import {Sidebar} from '@/components/commons/sidebar/Sidebar';
+import { Diagram } from '@/components/commons/diagram/Diagram';
+import { Sidebar } from '@/components/commons/sidebar/Sidebar';
 
 /**
  * Modeler page.

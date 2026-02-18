@@ -1,13 +1,13 @@
-import {expect, Page} from '@playwright/test';
-
 import path from 'path';
 
-import {test} from '../electron.fixture';
-import {uploadFile} from '../helpers/diagramHelpers';
+import { expect, Page } from '@playwright/test';
+
+import { test } from '../electron.fixture';
+import { uploadFile } from '../helpers/diagramHelpers';
 
 test.describe('scenario for export services spec files', () => {
   let page: Page;
-  test.beforeAll(async ({page: appPage}) => {
+  test.beforeAll(async ({ page: appPage }) => {
     page = appPage;
 
     const filePath = path.join(
@@ -18,7 +18,7 @@ test.describe('scenario for export services spec files', () => {
   });
 
   test('should be enabled export button if services selected', async () => {
-    await page.locator('.ant-notification-notice-success').waitFor({state: 'visible'});
+    await page.locator('.ant-notification-notice-success').waitFor({ state: 'visible' });
 
     await page.click('button:has-text("Export")');
 

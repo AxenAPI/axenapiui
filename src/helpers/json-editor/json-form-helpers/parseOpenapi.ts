@@ -1,4 +1,6 @@
-import {TSchema, TSchemaObject} from '@/types/common';
+import { logger } from '@shared/lib/logger';
+
+import { TSchema, TSchemaObject } from '@/types/common';
 
 // Функция для удаления структур oneOf, anyOf, allOf
 export function removeUnionSchemas(schema: TSchema): TSchema {
@@ -7,7 +9,7 @@ export function removeUnionSchemas(schema: TSchema): TSchema {
   }
 
   // Создаём поверхностную копию, чтобы не изменять оригинальный объект
-  const {anyOf, oneOf, ...schemaObject} = schema;
+  const { anyOf, oneOf, ...schemaObject } = schema;
 
   // Обрабатываем элементы массива
   if ('items' in schemaObject && schemaObject.items) {
@@ -41,8 +43,8 @@ export function removeUnionSchemas(schema: TSchema): TSchema {
     }, {} as TSchemaObject);
 
     // Объединяем с родительской схемой (исключая allOf)
-    const {...rest} = schemaObject;
-    return {...mergedSchema, ...rest};
+    const { ...rest } = schemaObject;
+    return { ...mergedSchema, ...rest };
   }
 
   // Обрабатываем объединённые схемы (anyOf/oneOf), беря первый вариант
@@ -63,7 +65,7 @@ export function removeUnionSchemas(schema: TSchema): TSchema {
   return schemaObject;
 }
 
-export function parseOpenapi(schema: string): TSchema {
+export function parseOpenapi(schema: string): TSchema | void {
   try {
     // Код на случай если будет необходимость парсить $ref в схеме
     // import SwaggerParser from '@apidevtools/swagger-parser';
@@ -86,7 +88,6 @@ export function parseOpenapi(schema: string): TSchema {
 
     return removeUnionSchemas(parsedSchema);
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('Error parsing OpenAPI schema:', err);
+    logger.error('Error parsing OpenAPI schema:', err);
   }
 }

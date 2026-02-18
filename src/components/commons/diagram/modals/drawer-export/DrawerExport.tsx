@@ -1,29 +1,31 @@
 import {
   Button as UIKitButton,
-  Drawer as UIKitDrawer,
   Checkbox as UIKitCheckbox,
+  Drawer as UIKitDrawer,
   Form as UIKitForm,
   FormItem as UIKitFormItem,
   NodeSkeleton as UIKitSkeleton,
 } from '@axenix/ui-kit';
-import {useUnit} from 'effector-react';
-import {FC, useState} from 'react';
+import { useUnit } from 'effector-react';
+import { FC, useState } from 'react';
+
+import type { TDownloadItem } from '@common/types';
+
+import { API_URL } from '@shared/api';
+import { GenerateSpecPost200Response } from '@shared/openapi';
 
 import {
   $drawerExport,
   closeDrawerExport,
   fetchExportLinksFx,
 } from '@/components/commons/diagram/model/modals-models/drawer-export/DrawerExportModel';
-import {downloadFiles} from '@/helpers/download-file';
-import {$eventGraph} from '@/models/EventGraphModel';
-import {API_URL} from '@/shared/api/client';
-import {GenerateSpecPost200Response} from '@/shared/api/event-graph-api';
-import {TDownloadItem} from '@/types/common';
+import { downloadFiles } from '@/helpers/download-file';
+import { $eventGraph } from '@/models/EventGraphModel';
 
 export const DrawerExport: FC = () => {
   const drawerExport = useUnit($drawerExport);
   const eventGraph = useUnit($eventGraph);
-  const {isOpen} = drawerExport;
+  const { isOpen } = drawerExport;
   const [exportLinks, setExportLinks] = useState<GenerateSpecPost200Response['downloadLinks'] | null>(null);
   const [specsToDownload, setSpecsToDownload] = useState<string[]>([]);
 
@@ -34,6 +36,9 @@ export const DrawerExport: FC = () => {
   };
 
   const handleExport = async () => {
+    if (!exportLinks) {
+      return;
+    }
     const downloadItems: TDownloadItem[] = specsToDownload
       .filter(filename => filename in exportLinks)
       .map(serviceName => ({
@@ -62,7 +67,6 @@ export const DrawerExport: FC = () => {
 
   return (
     <UIKitDrawer
-      size="350px"
       width={350}
       isResizable
       isDestroyOnClose
@@ -76,16 +80,17 @@ export const DrawerExport: FC = () => {
             type="primary"
             isDisabled={!specsToDownload.length}
             onClick={handleExport}
-            style={{borderRadius: '3px'}}
+            style={{ borderRadius: '3px' }}
           >
             Export
           </UIKitButton>
-          <UIKitButton type="default" onClick={handleClose} style={{borderRadius: '3px'}}>
+          <UIKitButton type="default" onClick={handleClose} style={{ borderRadius: '3px' }}>
             Cancel
           </UIKitButton>
         </div>
       }
       classNames={{
+        // @ts-expect-error 'body' is not in type
         body: 'scrollbar',
       }}
       afterOpenChange={fetchExportLinks}
@@ -96,6 +101,7 @@ export const DrawerExport: FC = () => {
             <div className="flex w-full flex-col gap-4 overflow-hidden">
               {Object.keys(exportLinks).map(serviceName => (
                 <UIKitCheckbox
+                  key={serviceName}
                   isChecked={specsToDownload.includes(serviceName)}
                   onChange={() => toggleSpecsToDownload(serviceName)}
                 >

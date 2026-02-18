@@ -1,4 +1,4 @@
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO } from '@shared/openapi';
 
 export const EventGraph5: EventGraphDTO = {
   name: 'no_consumes_outgoing_with_broker_type_service_same_name',
@@ -9,7 +9,7 @@ export const EventGraph5: EventGraphDTO = {
       belongsToGraph: ['a1b2c3d4-e5f6-7890-1234-567890abcdef'],
       name: 'no_consumes_outgoing_with_broker_type_service_same_name',
       type: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
     },
     {
       id: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
@@ -35,16 +35,19 @@ export const EventGraph5: EventGraphDTO = {
   ],
   links: [
     {
+      id: 'link-g5-1',
       fromId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       toId: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
       eventId: 'c3d4e5f6-7890-1234-5678-90abcdef0123',
     },
     {
+      id: 'link-g5-2',
       fromId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       toId: '567890ab-cdef-1234-5678-90abcde12345',
       eventId: '12345678-90ab-cdef-1234-567890abcdef',
     },
     {
+      id: 'link-g5-3',
       fromId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       toId: '17c01075-92f4-4c03-b2e2-6e6e50240bc9',
       eventId: 'a1b2c3d4-1234-5678-1234-567890abcdef',

@@ -1,0 +1,42 @@
+x-base: &base
+  volumes:
+    - .:/project
+    - /project/node_modules
+    - ./.cache/electron:/root/.cache/electron
+    - ./.cache/electron-builder:/root/.cache/electron-builder
+  env_file:
+    - .env
+    - .env.loc
+    - .env.electron
+
+services:
+  win:
+    <<: *base
+    build:
+      context: .
+      dockerfile: Dockerfile.win
+    environment:
+      - WINEDEBUG=-all
+      - WINEARCH=win64
+      - XDG_RUNTIME_DIR=/tmp
+      - ELECTRON_CACHE=/project/.cache/electron
+      - ELECTRON_BUILDER_CACHE=/project/.cache/electron-builder
+      - USE_HARD_LINKS=false
+    command: bash -c "yarn build:win"
+
+  mac:
+    <<: *base
+    build:
+      context: .
+      dockerfile: Dockerfile.mac
+    command: bash -c "yarn build:mac"
+
+  linux:
+    <<: *base
+    build:
+      context: .
+      dockerfile: Dockerfile.linux
+    environment:
+      - APPIMAGE_EXTRACT_AND_RUN=1
+      - USE_HARD_LINKS=false
+    command: bash -c "yarn build:linux"

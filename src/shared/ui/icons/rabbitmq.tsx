@@ -1,4 +1,4 @@
-import {Icon} from '@axenix/ui-kit';
+import { Icon } from '@axenix/ui-kit';
 
 export const RabbitMqIcon = () => (
   <Icon

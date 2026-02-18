@@ -1,13 +1,14 @@
-import type {EdgeTypes, NodeTypes} from '@xyflow/react';
+import type { EdgeProps, EdgeTypes, NodeTypes } from '@xyflow/react';
 
-import {CustomEdge} from '@/components/commons/diagram/edges/CustomEdge';
-import {DisconnectedEdge} from '@/components/commons/diagram/edges/DisconnectedEdge';
-import {ExpandableEdge} from '@/components/commons/diagram/edges/ExpandableEdge';
-import {SimpleEdge} from '@/components/commons/diagram/edges/SimpleEdge';
-import {CustomNode} from '@/components/commons/diagram/nodes/CustomNode';
-import {ExpandedEventNode} from '@/components/commons/diagram/nodes/ExpandedEventNode';
-import {GhostNode} from '@/components/commons/diagram/nodes/GhostNode';
-import {EEdgeTypes, ENodeTypes} from '@/enums/common';
+import { CustomEdge } from '@/components/commons/diagram/edges/CustomEdge';
+import { DisconnectedEdge } from '@/components/commons/diagram/edges/DisconnectedEdge';
+import { ExpandableEdge } from '@/components/commons/diagram/edges/ExpandableEdge';
+import { SimpleEdge } from '@/components/commons/diagram/edges/SimpleEdge';
+import { CustomNode } from '@/components/commons/diagram/nodes/ui/CustomNode';
+import { ExpandedEventNode } from '@/components/commons/diagram/nodes/ui/ExpandedEventNode';
+import { GhostNode } from '@/components/commons/diagram/nodes/ui/GhostNode';
+import { EEdgeTypes, ENodeTypes } from '@/enums/common';
+import type { TExpandableItem } from '@/types/common';
 
 export const edgeTypes: EdgeTypes = {
   [EEdgeTypes.CUSTOM]: CustomEdge,
@@ -21,6 +22,8 @@ export const nodeTypes: NodeTypes = {
   [ENodeTypes.GHOST]: GhostNode,
   [ENodeTypes.EXPANDED_EVENT]: ExpandedEventNode,
 };
+
+export type TEdgeProps = EdgeProps & { data: TExpandableItem };
 
 export const edgeColors = [
   '#FF0000',

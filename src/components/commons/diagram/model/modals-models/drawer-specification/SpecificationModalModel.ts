@@ -1,7 +1,7 @@
-import {createEffect, createEvent, createStore} from 'effector';
+import { createEffect, createEvent, createStore } from 'effector';
 
-import {apiClient} from '@/shared/api/client';
-import {GetServiceSpecificationPostRequest, UpdateServiceSpecificationPostRequest} from '@/shared/api/event-graph-api';
+import { EventGraphService } from '@shared/api/services';
+import { GetServiceSpecificationPostRequest, UpdateServiceSpecificationPostRequest } from '@shared/openapi';
 
 export const openSpecificationModal = createEvent<string>();
 export const closeSpecificationModal = createEvent();
@@ -9,7 +9,7 @@ export const closeSpecificationModal = createEvent();
 // Стор модального окна информационной панели. Содержит два поля:
 // - isOpen: boolean - флаг открытия/закрытия модального окна
 // - itemId: string - идентификатор элемента, для которого открыто окно
-export const $specificationModal = createStore<{isOpen: boolean; nodeId: string}>({
+export const $specificationModal = createStore<{ isOpen: boolean; nodeId: string }>({
   isOpen: false,
   nodeId: '',
 })
@@ -23,9 +23,9 @@ export const $specificationModal = createStore<{isOpen: boolean; nodeId: string}
 export const fetchServiceSpecificationFx = createEffect(
   async (getServiceSpecificationPostRequest: GetServiceSpecificationPostRequest) => {
     try {
-      return await apiClient.getServiceSpecificationPost({getServiceSpecificationPostRequest});
+      return await EventGraphService.getServiceSpecification(getServiceSpecificationPostRequest);
     } catch (e) {
-      throw new Error(e);
+      throw new Error(e instanceof Error ? e.message : 'Failed to fetch service specification');
     }
   }
 );
@@ -36,11 +36,9 @@ export const fetchServiceSpecificationFx = createEffect(
 export const updateServiceSpecification = createEffect(
   async (updateServiceSpecificationPostRequest: UpdateServiceSpecificationPostRequest) => {
     try {
-      const response = await apiClient.updateServiceSpecificationPost({updateServiceSpecificationPostRequest});
-
-      return response;
+      return await EventGraphService.updateServiceSpecification(updateServiceSpecificationPostRequest);
     } catch (error) {
-      throw new Error(error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to update service specification');
     }
   }
 );

@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# Postinstall script for Axenapi macOS package
+# This script runs after the application is installed
+
+
+# Логи будут в системном логе и в отдельном файле
+LOG_FILE="/tmp/axenapi-postinstall.log"
+
+# Перенаправляем весь вывод в лог
+exec > "$LOG_FILE" 2>&1
+
+echo "=== Axenapi Post-Install Script Started ==="
+echo "Date: $(date)"
+echo "User: $(whoami)"
+echo "Arguments: $@"
+
+echo ""
+echo "$1: Full Path to Package"
+echo "$2: Full Path to target installation directory: /Applications"
+echo "$3: Mountpoint of installation disk: / or /Volumes/External_Drive"
+echo "$4: Root directory of currently booted system"
+echo ""
+
+# Get the installation directory
+APP_PATH="$2"
+echo "Installation directory: $APP_PATH"
+
+# Определяем путь к приложению
+if [ -z "$APP_PATH" ]; then
+    # Параметр пустой — используем путь по умолчанию
+    APP_PATH="/Applications/Axenapi.app"
+    echo "No install dir provided, using default: $APP_PATH"
+elif [[ "$APP_PATH" == *.app ]]; then
+    # Путь уже содержит .app — используем как есть
+    echo "Using provided path: $APP_PATH"
+else
+    # Путь не содержит .app — добавляем имя приложения
+    APP_PATH="$APP_PATH/Axenapi.app"
+    echo "Appending app name to path: $APP_PATH"
+fi
+
+# Set proper permissions for the application
+if [ -d "$APP_PATH" ]; then
+    echo "Found application at: $APP_PATH"
+    echo "Setting permissions..."
+    chmod -R 755 "$APP_PATH" && echo "Permissions set successfully" || echo "Failed to set permissions"
+
+    # Убираем карантин и разрешаем запуск через Gatekeeper
+    echo "Removing quarantine attribute..."
+    xattr -r -d com.apple.quarantine "$APP_PATH" 2>&1 && echo "Quarantine removed" || echo "No quarantine to remove"
+
+    ls -la@ "$APP_PATH"
+
+    # Добавляем ad-hoc подпись для неподписанного приложения
+    echo "Adding ad-hoc signature..."
+    codesign --force --deep --sign - "$APP_PATH" 2>&1 && echo "Signed successfully" || echo "Signing failed"
+
+    echo "Post-installation completed successfully."
+else
+    echo "ERROR: Application not found at $APP_PATH"
+    ls -la "$(dirname "$APP_PATH")" 2>&1 || echo "Parent directory doesn't exist"
+fi
+
+echo "=== Axenapi Post-Install Script Completed ==="
+echo ""
+
+# Также пишем в системный лог
+logger "Axenapi postinstall completed. Check $LOG_FILE for details"
+
+exit 0

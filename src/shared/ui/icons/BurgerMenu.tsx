@@ -1,14 +1,14 @@
-import {FC} from 'react';
+import { FC } from 'react';
 
 interface IBurgerIconProps {
   isOpen: boolean;
   onClick: () => void;
 }
 
-export const BurgerIcon: FC<IBurgerIconProps> = ({isOpen, onClick}) => (
+export const BurgerIcon: FC<IBurgerIconProps> = ({ isOpen, onClick }) => (
   <button
     onClick={onClick}
-    className="relative h-8 w-8 focus:outline-none"
+    className="relative h-8 w-8 cursor-pointer focus:outline-none"
     aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
   >
     <div className="absolute top-1/2 left-1/2 w-6 -translate-x-1/2 -translate-y-1/2 transform">

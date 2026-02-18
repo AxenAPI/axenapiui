@@ -1,11 +1,11 @@
-import {Edge} from '@xyflow/react';
+import { Edge } from '@xyflow/react';
 import stc from 'string-to-color';
 
-import {EEdgeTypes} from '@/enums/common';
+import { EEdgeTypes } from '@/enums/common';
 
 export const expectedEventGraphLinks1: Edge[] = [
   {
-    id: 'b2c3d4e5-f678-9012-3456-7890abcdef01->a1b2c3d4-e5f6-7890-1234-567890abcdef.0',
+    id: 'l1',
     source: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
     target: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
     type: EEdgeTypes.CUSTOM,
@@ -18,7 +18,7 @@ export const expectedEventGraphLinks1: Edge[] = [
 
 export const expectedEventGraphLinks2: Edge[] = [
   {
-    id: 'b2c3d4e5-f678-9012-3456-7890abcdef01->a1b2c3d4-e5f6-7890-1234-567890abcdef.0',
+    id: 'link-g2-1',
     source: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
     target: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
     type: EEdgeTypes.CUSTOM,
@@ -28,7 +28,7 @@ export const expectedEventGraphLinks2: Edge[] = [
     },
   },
   {
-    id: 'c3d4e5f6-7890-1234-5678-90abcdef0123->a1b2c3d4-e5f6-7890-1234-567890abcdef.1',
+    id: 'link-g2-2',
     source: 'c3d4e5f6-7890-1234-5678-90abcdef0123',
     target: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
     type: EEdgeTypes.CUSTOM,
@@ -38,7 +38,7 @@ export const expectedEventGraphLinks2: Edge[] = [
     },
   },
   {
-    id: 'd4e5f678-9012-3456-7890-abcdef012345->a1b2c3d4-e5f6-7890-1234-567890abcdef.2',
+    id: 'link-g2-3',
     source: 'd4e5f678-9012-3456-7890-abcdef012345',
     target: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
     type: EEdgeTypes.CUSTOM,
@@ -49,7 +49,7 @@ export const expectedEventGraphLinks2: Edge[] = [
   },
 ];
 
-export const expectedConsume_1: Edge[] = [
+export const expectedConsume1: Edge[] = [
   {
     id: 'dd0d6793-427e-46da-8b48-a769dd07ab2d',
     source: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
@@ -72,7 +72,7 @@ export const expectedConsume_1: Edge[] = [
   },
 ];
 
-export const expectedConsume_2: Edge[] = [
+export const expectedConsume2: Edge[] = [
   {
     id: '11f1588f-8e1c-4c14-b4dc-37465dbd5213',
     source: 'b2c3d4e5-f678-9012-3456-7890abcdef01',

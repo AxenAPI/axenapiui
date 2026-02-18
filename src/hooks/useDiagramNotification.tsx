@@ -1,6 +1,8 @@
-import {useNotification} from '@axenix/ui-kit';
-import {useUnit} from 'effector-react';
-import {useCallback, useEffect} from 'react';
+import { useNotification } from '@axenix/ui-kit';
+import { useUnit } from 'effector-react';
+import { useCallback, useEffect } from 'react';
+
+import { NodeDTOTypeEnum } from '@shared/openapi';
 
 import {
   addEvent,
@@ -14,7 +16,6 @@ import {
   removeNodes,
   removeNodeWithConnectedLinks,
 } from '@/models/EventGraphModel';
-import {NodeDTOTypeEnum} from '@/shared/api/event-graph-api';
 
 export const NOTIFICATION_KEY = {
   fetchEventGraphStatus: 'fetchEventGraphStatus',
@@ -34,17 +35,17 @@ export const useDiagramNotification = () => {
   const isPending = useUnit(fetchEventGraphDataFx.pending);
 
   const notifySuccess = useCallback(
-    (key: string, message: string) => api.success({key, message, placement: 'bottomRight', duration: 1.5}),
+    (key: string, message: string) => api.success({ key, message, placement: 'bottomRight', duration: 1.5 }),
     [api]
   );
 
   const notifyError = useCallback(
-    (key: string, message: string) => api.error({key, message, placement: 'bottomRight', duration: 1.5}),
+    (key: string, message: string) => api.error({ key, message, placement: 'bottomRight', duration: 1.5 }),
     [api]
   );
 
   const notifyLoading = useCallback(
-    (key: string, message: string) => api.open({key, message, placement: 'bottomRight', duration: 0}),
+    (key: string, message: string) => api.open({ key, message, placement: 'bottomRight', duration: 0 }),
     [api]
   );
 
@@ -132,5 +133,5 @@ export const useDiagramNotification = () => {
     };
   }, [api, notifyError, notifySuccess]);
 
-  return {api, contextHandler};
+  return { api, contextHandler };
 };

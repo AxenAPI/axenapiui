@@ -1,8 +1,8 @@
-import {ReactFlowProvider} from '@xyflow/react';
-import {FC} from 'react';
+import { ReactFlowProvider } from '@xyflow/react';
+import { FC } from 'react';
 
-import {JsonEditorContent} from '@/components/jsonEditor/JsonEditorContent';
-import {JsonEditorSidebar} from '@/components/jsonEditor/JsonEditorSidebar';
+import { JsonEditorContent } from '@/components/jsonEditor/ui/JsonEditorContent';
+import { JsonEditorSidebar } from '@/components/jsonEditor/ui/JsonEditorSidebar';
 
 /**
  * Json editor page.

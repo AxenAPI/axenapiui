@@ -1,12 +1,14 @@
-import {_electron as electron, ElectronApplication, Page} from '@playwright/test';
-
-import {BrowserWindow} from 'electron';
 import path from 'path';
 
-export async function launchElectronApp(): Promise<{app: ElectronApplication; window: Page}> {
+import { _electron as electron, ElectronApplication, Page } from '@playwright/test';
+import { BrowserWindow } from 'electron';
+
+import { logger } from '@shared/lib/logger';
+
+export async function launchElectronApp(): Promise<{ app: ElectronApplication; window: Page }> {
   const mainProcessPath = path.resolve(__dirname, '../.webpack/x64/main');
 
-  console.log(`Main process path: ${mainProcessPath}`);
+  logger.log(`Main process path: ${mainProcessPath}`);
 
   const app = await electron.launch({
     args: [mainProcessPath],
@@ -25,12 +27,12 @@ export async function launchElectronApp(): Promise<{app: ElectronApplication; wi
   }
 
   await window.waitForLoadState('domcontentloaded');
-  console.log(`App is fully loaded`);
+  logger.log(`App is fully loaded`);
 
-  return {app, window};
+  return { app, window };
 }
 
 export async function closeElectronApp(app: ElectronApplication) {
-  console.log('Closing Electron app...');
+  logger.log('Closing Electron app...');
   await app.close();
 }

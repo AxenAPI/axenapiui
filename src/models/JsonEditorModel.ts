@@ -1,7 +1,16 @@
-import {createStore, createEvent, createEffect} from 'effector';
+/** *************************************************************************************************
+ * FIXME
+ * ВНИМАНИЕ! ЭТА МОДЕЛЬ УСТАРЕЛА И ПОДЛЕЖИТ РЕФАКТОРИНГУ!
+ *
+ * ВЕСЬ КОД В ЭТОМ ФАЙЛЕ ДОЛЖЕН БЫТЬ ПЕРЕПИСАН В СООТВЕТСТВИИ С ПРАВИЛАМИ,
+ * ОПИСАННЫМИ В ДОКУМЕНТАЦИИ.
+ *
+ ************************************************************************************************** */
 
-import {apiClient} from '@/shared/api/client';
-import {EventDTO, GenerateJsonExamplePostRequest} from '@/shared/api/event-graph-api';
+import { createEffect, createEvent, createStore } from 'effector';
+
+import { JsonService } from '@shared/api/services';
+import { EventDTO, GenerateJsonExamplePostRequest } from '@shared/openapi';
 
 // Создаем событие для выбора элемента
 export const selectMenuItem = createEvent<EventDTO>();
@@ -16,9 +25,9 @@ export const $selectedMenuItem = createStore<EventDTO | null>(null)
 export const fetchJsonDataExapmleFx = createEffect(
   async (generateJsonExamplePostRequest: GenerateJsonExamplePostRequest) => {
     try {
-      return await apiClient.generateJsonExamplePost({generateJsonExamplePostRequest});
+      return await JsonService.generateExample(generateJsonExamplePostRequest);
     } catch (e) {
-      throw new Error(e);
+      throw new Error(e instanceof Error ? e.message : 'Failed to generate JSON example');
     }
   }
 );

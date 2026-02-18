@@ -7,3 +7,110 @@
 ._contentEditable_sects_380 {
   padding: var(--spacing-6) !important;
 }
+
+.ant-popover .ant-popover-inner {
+  padding: 0;
+}
+
+.ant-popover .ant-menu {
+  border-radius: 8px;
+}
+
+.mdxeditor {
+  /* для липучести mdxeditor-toolbar */
+  overflow: clip;
+
+  /* Стили внутри редактора */
+  .mdxeditor-rich-text-editor {
+    h1,
+    h2,
+    h3 {
+      /*
+        Откатываем стиль для редактора
+      */
+      font-size: revert;
+      font-weight: revert;
+    }
+
+    blockquote {
+      font-style: italic;
+      border-left-width: 0.25rem;
+      border-left-color: var(--color-text-tertiary);
+      margin-top: 1em;
+      margin-bottom: 1em;
+      padding-left: 8px;
+    }
+
+    /* Стили для блоков с нумерацией строк в режиме Code Block */
+    .ͼ1 .cm-lineNumbers .cm-gutterElement {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Стили для списков */
+
+    ul,
+    ol {
+      margin-left: 8px;
+      list-style: revert;
+    }
+
+    li[role='checkbox'] {
+      padding-left: var(--spacing-7);
+    }
+
+    li[role='checkbox']:before {
+      top: var(--spacing-1);
+      left: var(--spacing-1);
+    }
+
+    li[role='checkbox'][aria-checked='true']:after {
+      top: var(--spacing-2);
+      left: var(--spacing-2_5);
+    }
+
+    /** Блок редактирования диаграммы */
+
+    .diagram-edit-container {
+      position: relative;
+      overflow: auto;
+      padding: 4px 0;
+      display: flex;
+      flex-direction: row-reverse;
+    }
+
+    .diagram-content {
+      flex: 1;
+    }
+
+    .diagram-editor {
+      display: flex;
+      width: 400px;
+      flex: unset;
+    }
+
+    .diagram-content__area {
+      width: 100%;
+    }
+
+    .diagram-content textarea {
+      width: 100%;
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    .diagram-placard {
+      padding: 8px;
+      border: 1px solid var(--color-editor-placrard-border);
+      border-radius: 4px;
+      color: var(--color-color-text-placrard);
+      height: 100px;
+    }
+
+    .placard__error {
+      color: var(--color-color-error);
+      background-color: var(--color-bg-editor-error-placrard);
+    }
+  }
+}

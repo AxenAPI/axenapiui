@@ -1,5 +1,5 @@
-import {getSchemaType} from '@/helpers/json-editor';
-import {TSchema} from '@/types/common';
+import { getSchemaType } from '@/helpers/json-editor';
+import { TSchema } from '@/types/common';
 
 describe('/src/helpers/json-editor/helpers.ts/getSchemaType', () => {
   test('should return undefined for undefined/null schema', () => {
@@ -18,11 +18,11 @@ describe('/src/helpers/json-editor/helpers.ts/getSchemaType', () => {
 
   test('should return type for schema object without $ref', () => {
     // Arrange
-    const stringSchema: TSchema = {type: 'string'};
-    const numberSchema: TSchema = {type: 'number'};
-    const objectSchema: TSchema = {type: 'object', properties: {}};
-    const arraySchema: TSchema = {type: 'array', items: {type: 'string'}};
-    const booleanSchema: TSchema = {type: 'boolean'};
+    const stringSchema: TSchema = { type: 'string' };
+    const numberSchema: TSchema = { type: 'number' };
+    const objectSchema: TSchema = { type: 'object', properties: {} };
+    const arraySchema: TSchema = { type: 'array', items: { type: 'string' } };
+    const booleanSchema: TSchema = { type: 'boolean' };
 
     // Act & Assert
     expect(getSchemaType(stringSchema)).toBe('string');
@@ -34,8 +34,8 @@ describe('/src/helpers/json-editor/helpers.ts/getSchemaType', () => {
 
   test('should return ref name for schema with $ref property', () => {
     // Arrange
-    const refSchema = {$ref: '#/components/schemas/User'};
-    const refWithTypeSchema = {$ref: '#/components/schemas/User', type: 'object'};
+    const refSchema = { $ref: '#/components/schemas/User' };
+    const refWithTypeSchema = { $ref: '#/components/schemas/User', type: 'object' };
 
     // Act & Assert
     expect(getSchemaType(refSchema)).toBe('User');
@@ -44,7 +44,7 @@ describe('/src/helpers/json-editor/helpers.ts/getSchemaType', () => {
 
   test('should return undefined when schema has neither type nor $ref', () => {
     // Arrange
-    const noTypeSchema = {description: 'Some schema'};
+    const noTypeSchema = { description: 'Some schema' };
 
     // Act & Assert
     expect(getSchemaType(noTypeSchema)).toBeUndefined();
@@ -52,15 +52,13 @@ describe('/src/helpers/json-editor/helpers.ts/getSchemaType', () => {
 
   test('should handle edge cases for $ref values', () => {
     // Arrange
-    // @ts-expect-error - testing invalid case
-    const undefinedRefSchema = {$ref: undefined};
-    // @ts-expect-error - testing invalid case
-    const nullRefSchema = {$ref: null};
-    const emptyRefSchema = {$ref: '', type: 'string'};
+    const undefinedRefSchema = { $ref: undefined };
+    const nullRefSchema = { $ref: null };
+    const emptyRefSchema = { $ref: '', type: 'string' };
 
     // Act & Assert
-    expect(getSchemaType(undefinedRefSchema)).toBeUndefined();
-    expect(getSchemaType(nullRefSchema)).toBeUndefined();
+    expect(getSchemaType(undefinedRefSchema as unknown as TSchema)).toBeUndefined();
+    expect(getSchemaType(nullRefSchema as unknown as TSchema)).toBeUndefined();
     expect(getSchemaType(emptyRefSchema)).toBeUndefined();
   });
 });

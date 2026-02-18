@@ -1,0 +1,36 @@
+.itemMenu {
+  width: 100%;
+
+  & :global {
+    .ant-menu-submenu-title {
+      padding: 0 !important;
+      width: 100%;
+    }
+
+    .ant-menu-title-content {
+      width: 100%;
+    }
+
+    .ant-space {
+      width: 100%;
+    }
+
+    .ant-space-item {
+      width: 100%;
+    }
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px 0 20px;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}

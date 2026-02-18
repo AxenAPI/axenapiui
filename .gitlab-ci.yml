@@ -1,0 +1,299 @@
+variables:
+  CACHE_FALLBACK_KEY: $CI_COMMIT_REF_SLUG
+  KUBERNETES_CPU_REQUEST: '1'
+  KUBERNETES_MEMORY_REQUEST: '4Gi'
+  KUBERNETES_EPHEMERAL_STORAGE_REQUEST: '5Gi'
+
+.rules:main-branch-only: &rules_main_branch_only
+  - if: '$CI_COMMIT_REF_NAME == "main"'
+  - if: '$DEPLOY_WEB_READ_ONLY == "true"'
+
+.rules:merge_request: &rules_merge_request
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  - if: '$CI_COMMIT_REF_NAME == "main"'
+  - if: '$CI_COMMIT_REF_NAME =~ /^release-.*/'
+
+.rules:build_distribution: &rules_build_distribution
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    when: never
+  - if: '$CI_COMMIT_REF_NAME == "main" && $DEPLOY_DESKTOP == "windows"'
+
+.retry: &retry
+  max: 2
+  when: [runner_system_failure, job_execution_timeout, unknown_failure, data_integrity_failure, script_failure]
+
+.with_node_modules: &with_node_modules
+  needs: [install-dependencies]
+  before_script:
+    - |
+      echo "--- 📦 Восстановление зависимостей ---"
+      if [ -f "node_modules.tar.gz" ]; then
+        echo "📂 Найдено в артефактах. Быстрая распаковка..."
+        START_TIME=$(date +%s)
+        tar -xzf node_modules.tar.gz && rm node_modules.tar.gz
+        END_TIME=$(date +%s)
+        echo "✅ Распаковано за $((END_TIME - START_TIME)) сек."
+      else
+        echo "⚠️ Архива нет. Запускаю yarn install (использую кэш .yarn/cache)..."
+        START_TIME=$(date +%s)
+        yarn install --immutable
+        END_TIME=$(date +%s)
+        echo "✅ Установка завершена за $((END_TIME - START_TIME)) сек."
+      fi
+
+      if [ -d ".yarn/cache" ]; then
+        YARN_CACHE_SIZE=$(du -sh .yarn/cache | cut -f1)
+        echo "📂 Размер .yarn/cache: $YARN_CACHE_SIZE"
+      fi
+      echo "----------------------------------------"
+
+.tags: &tags
+  - k8s
+  - edu
+
+.cache: &cache
+  key:
+    files:
+      - yarn.lock
+  paths:
+    - .yarn/cache
+  policy: pull
+
+default:
+  tags: *tags
+  image: node:20-alpine
+  retry: *retry
+
+stages:
+  - setup
+  - lint
+  - test
+  - build
+  - build-docker
+  - deploy
+  - prepare
+  - build-desktop
+
+# ---------------- SETUP -----------------------
+
+install-dependencies:
+  stage: setup
+  cache:
+    <<: *cache
+    policy: pull-push
+  script:
+    - |
+      echo "🚀 Начинаю установку зависимостей..."
+      START_TIME_I=$(date +%s)
+      yarn install --immutable
+
+      echo "📊 Вес node_modules после установки: $(du -sh node_modules)"
+
+      echo "📦 Упаковка в сжатый архив..."
+      START_TIME=$(date +%s)
+      tar -cf - node_modules | gzip -1 > node_modules.tar.gz
+      END_TIME=$(date +%s)
+      echo "✅ Архив создан за $((END_TIME - START_TIME)) сек."
+
+      echo "📎 Размер архива для загрузки в артефакты: $(ls -lh node_modules.tar.gz)"
+
+      END_TIME_I=$(date +%s)
+      echo "---- 🚀 Зависимости и архив готовы за $((END_TIME_I - START_TIME_I)) сек. ----"
+  rules: *rules_merge_request
+  artifacts:
+    paths:
+      - node_modules.tar.gz
+    expire_in: 3 hours
+
+generate-openapi-client:
+  stage: setup
+  <<: *with_node_modules
+  before_script:
+    - !reference [.with_node_modules, before_script]
+    - apk add --no-cache openjdk17-jre
+  script:
+    - yarn update:force
+  rules: *rules_merge_request
+  needs: [install-dependencies]
+  artifacts:
+    paths:
+      - src/shared/openapi/
+    expire_in: 3 hours
+
+# ---------------- LINT & TEST -----------------------
+
+lint-staged-check:
+  stage: lint
+  <<: *with_node_modules
+  before_script:
+    - !reference [.with_node_modules, before_script]
+    - apk add --no-cache git
+  rules: *rules_merge_request
+  script:
+    - git fetch --unshallow || true
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - npx lint-staged --diff "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...$CI_COMMIT_SHA" --allow-empty
+  needs: [install-dependencies, generate-openapi-client]
+
+full-check:
+  stage: lint
+  <<: *with_node_modules
+  rules: *rules_merge_request
+  script:
+    - yarn lint:error
+    - yarn check-types
+  needs: [install-dependencies, generate-openapi-client]
+
+test:
+  stage: test
+  <<: *with_node_modules
+  script:
+    - yarn test:fast
+  rules: *rules_merge_request
+  needs: [lint-staged-check, full-check, install-dependencies, generate-openapi-client]
+
+# ---------------- BUILD -----------------------
+
+build:
+  stage: build
+  <<: *with_node_modules
+  script:
+    - yarn build
+  rules: *rules_merge_request
+  needs: [install-dependencies, generate-openapi-client, test]
+
+# -------------- Деплой отрабатывает после мерджа в main --------------------------
+
+build-docker:
+  stage: build-docker
+  image:
+    name: nexus-common.ru-central1.internal:5000/base/kaniko-project/executor:v1.23.2-debug
+    entrypoint: ['']
+  variables:
+    IMAGE: '$NEXUS_DOCKER/$CI_PROJECT_NAME:latest'
+  script:
+    # Создание .env.loc безопасно
+    - |
+      cat <<EOF > .env.loc
+      NEXUS_USERNAME=$NEXUS_USER
+      NEXUS_PASSWORD=$NEXUS_PASSWORD
+      EOF
+      chmod 600 .env.loc
+
+    # Настройка Kaniko
+    - mkdir -p /kaniko/.docker
+    - |
+      cat <<EOF > /kaniko/.docker/config.json
+      {
+        "auths": {
+          "$NEXUS_DOCKER": {
+            "username": "$NEXUS_USER",
+            "password": "$NEXUS_PASSWORD"
+          }
+        }
+      }
+      EOF
+
+    # Запуск сборки с кэшированием слоев
+    - /kaniko/executor \
+      --insecure \
+      --skip-tls-verify \
+      --cache=true \
+      --context $CI_PROJECT_DIR \
+      --dockerfile $CI_PROJECT_DIR/Dockerfile \
+      --destination $IMAGE
+  rules: *rules_main_branch_only
+  needs:
+    - job: test
+      optional: true
+
+deploy:
+  stage: deploy
+  image: nexus-common.ru-central1.internal:5000/deploy:latest
+  before_script:
+    - mkdir -p /root/.kube
+    - cp ${KUBE_CONFIG} /root/.kube/config
+    - chmod 600 /root/.kube/config
+    - export KUBECONFIG=/root/.kube/config
+  script:
+    - git clone -b main ${CI_SERVER_PROTOCOL}://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${DEPLOY_REPO} ansible
+    - ansible-playbook -i ansible/inventory/hosts \
+      --extra-vars "MODULE=${CI_PROJECT_NAME} PROJECT_DIR=${CI_PROJECT_DIR} PROJECT_NAME=${CI_COMMIT_REF_NAME} IMAGE_REGISTRY=${IMAGE_REGISTRY} COMMIT_TAG=${CI_COMMIT_SHORT_SHA}" \
+      ansible/deploy.yml
+  rules: *rules_main_branch_only
+  needs: [build-docker]
+
+# ---------------- Сборка дистрибутива, запускается в шедулере -----------------
+
+prepare_version:
+  stage: prepare
+  image: node:20-bullseye
+  script:
+    - |
+      VERSION=$(node -p "require('./package.json').version")
+      echo "📦 Версия из package.json: $VERSION"
+      cat <<EOF > version.env
+      VERSION=$VERSION
+      BASE_URL=http://nexus-common.ru-central1.internal:8081/repository/maven-releases/pro/axenix-innovation/axenapi/web/axenapi-web/$VERSION
+      FILE_PATH=./out/AxenixUi-v$VERSION.exe
+      DIST_NAME=AxenixUi-v$VERSION.exe
+      JAR_NAME=axenapi-web-$VERSION.jar
+      EOF
+  artifacts:
+    reports:
+      dotenv: version.env
+  rules: *rules_build_distribution
+
+build-desktop:
+  stage: build-desktop
+  image:
+    name: $NEXUS_DOCKER/electron-builder:latest
+    entrypoint: ['']
+  variables:
+    ELECTRON_CACHE: /root/.cache/electron
+    ELECTRON_BUILDER_CACHE: /root/.cache/electron-builder
+    NEXUS_DIST_URL: 'http://nexus-common.ru-central1.internal:8081/repository/distributions/pro/axenix-innovation/axenapi/distributions/builder'
+  cache:
+    <<: *cache
+    policy: pull
+  before_script:
+    - echo "⬇️ Скачиваем JAR и YAML файлы из Nexus..."
+    - mkdir -p ./jar-files
+    - curl -f -u "$NEXUS_USER:$NEXUS_PASSWORD" -o "./jar-files/$JAR_NAME" "$BASE_URL/$JAR_NAME"
+    - |
+      if [ -s "./jar-files/$JAR_NAME" ]; then
+        echo "✅ $JAR_NAME успешно скачан, размер: $(du -h ./jar-files/$JAR_NAME | cut -f1)"
+      else
+        echo "❌ Ошибка: $JAR_NAME не найден или пустой"
+        exit 1
+      fi
+    - curl -f -u "$NEXUS_USER:$NEXUS_PASSWORD" -o "./jar-files/$YAML_NAME" "$BASE_URL/$YAML_NAME"
+    - |
+      if [ -s "./jar-files/$YAML_NAME" ]; then
+        echo "✅ $YAML_NAME успешно скачан, размер: $(du -h ./jar-files/$YAML_NAME | cut -f1)"
+        unzip -j -o "./jar-files/$YAML_NAME" "axenapi-be.yml" -d ./src/shared/api && \
+        mv ./src/shared/api/axenapi-be.yml ./src/shared/api/schema.yaml
+      else
+        echo "❌ Ошибка: $YAML_NAME не найден или пустой"
+        exit 1
+      fi
+    - ls -lh ./jar-files/
+    - du -h -d1 ./jar-files/
+  script:
+    - echo "🖥️ Сборка Windows артефакта через electron-builder..."
+    - yarn install --immutable
+    - yarn update
+    - yarn build:win
+  after_script:
+    - echo "⬆️ Загружаем сборку $DIST_NAME в Nexus..."
+    - curl -u "$NEXUS_USER:$NEXUS_PASSWORD" --upload-file "$FILE_PATH" "$NEXUS_DIST_URL/$DIST_NAME"
+  artifacts:
+    when: always
+    paths:
+      - dist/win-unpacked/
+      - dist/*.exe
+    expire_in: 1 days
+  rules: *rules_build_distribution
+  needs:
+    - job: prepare_version
+      artifacts: true

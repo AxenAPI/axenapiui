@@ -1,23 +1,25 @@
 import {
+  Button as UIKitButton,
+  Drawer as UIKitDrawer,
   Form as UIKitForm,
   FormItem as UIKitFormItem,
   Input as UIKitInput,
   Select as UIKitSelect,
-  Drawer as UIKitDrawer,
   Space as UIKitSpace,
-  Button as UIKitButton,
 } from '@axenix/ui-kit';
-import {useUnit} from 'effector-react';
-import {FC, useEffect, useState} from 'react';
+import { useUnit } from 'effector-react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 
+import { NodeDTO } from '@shared/openapi';
+
+import { NodeFormData } from '@/components/commons/diagram/modals/lib/nodeToFormData';
 import {
   $drawerEditTopic,
   closeDrawerEditTopic,
 } from '@/components/commons/diagram/model/modals-models/drawer-edit-topic/DrawerEditTopicModel';
-import {$eventGraph, editNode} from '@/models/EventGraphModel';
-import {NodeDTO} from '@/shared/api/event-graph-api';
+import { $eventGraph, editNode } from '@/models/EventGraphModel';
 
-import {brokerOptions} from './constants';
+import { brokerOptions } from './constants';
 
 interface IDrawerTopicEditProps {
   name?: string;
@@ -27,30 +29,29 @@ interface IDrawerTopicEditProps {
 }
 
 export const DrawerTopicEdit: FC<IDrawerTopicEditProps> = () => {
-  const eventGraph = useUnit($eventGraph);
-  const drawerEditTopic = useUnit($drawerEditTopic);
+  const { drawerEditTopic, eventGraph } = useUnit({ eventGraph: $eventGraph, drawerEditTopic: $drawerEditTopic });
+  const { isOpen, itemId } = drawerEditTopic;
 
-  const {isOpen, itemId} = drawerEditTopic;
-
-  const [nodeData, setNodeData] = useState<Partial<NodeDTO>>({
+  const [nodeData, setNodeData] = useState<NodeFormData>({
     name: '',
-    brokerType: null,
+    brokerType: undefined,
     type: 'TOPIC',
+    id: '',
+    belongsToGraph: [],
   });
 
   const handleSave = () => {
-    editNode({id: itemId, updates: nodeData});
+    editNode({ id: itemId, updates: nodeData });
     closeDrawerEditTopic();
   };
 
-  const handleChange =
-    (field: keyof NodeDTO) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => {
-      if (typeof e === 'string') {
-        setNodeData({...nodeData, [field]: e});
-      } else {
-        setNodeData({...nodeData, [field]: e.target.value});
-      }
-    };
+  const handleChange = (field: keyof NodeDTO) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => {
+    if (typeof e === 'string') {
+      setNodeData({ ...nodeData, [field]: e });
+    } else {
+      setNodeData({ ...nodeData, [field]: e.target.value });
+    }
+  };
 
   const otherBroker = brokerOptions.find(option => option.value === nodeData.brokerType)?.label === 'Other';
 
@@ -59,6 +60,7 @@ export const DrawerTopicEdit: FC<IDrawerTopicEditProps> = () => {
       const node = eventGraph.nodes.find(n => n.id === itemId);
       if (node) {
         setNodeData({
+          ...node,
           name: node.name,
           brokerType: node.brokerType,
         });
@@ -68,12 +70,11 @@ export const DrawerTopicEdit: FC<IDrawerTopicEditProps> = () => {
 
   return (
     <UIKitDrawer
-      size="350px"
       width={350}
       isResizable
       isDestroyOnClose
       isOpen={isOpen}
-      onClose={closeDrawerEditTopic}
+      onClose={() => closeDrawerEditTopic()}
       placement="right"
       title="Topic edit"
       customFooter={
@@ -88,15 +89,15 @@ export const DrawerTopicEdit: FC<IDrawerTopicEditProps> = () => {
       }
     >
       <UIKitSpace direction="vertical" size="small">
-        <UIKitForm name="wrap" labelAlign="left" labelWrap colon style={{maxWidth: 302}} layout="vertical">
+        <UIKitForm name="wrap" labelAlign="left" labelWrap colon style={{ maxWidth: 302 }} layout="vertical">
           <UIKitFormItem label="Name">
-            <UIKitInput value={nodeData.name} style={{borderRadius: '3px '}} onChange={handleChange('name')} />
+            <UIKitInput value={nodeData.name} style={{ borderRadius: '3px ' }} onChange={handleChange('name')} />
           </UIKitFormItem>
           <UIKitFormItem label="Broker">
             <UIKitSelect
               className="min-w-[302px] [&>div]:rounded-[3px]"
-              dropdownStyle={{borderRadius: '3px'}}
-              style={{borderRadius: '3px '}}
+              dropdownStyle={{ borderRadius: '3px' }}
+              style={{ borderRadius: '3px ' }}
               defaultValue={nodeData.brokerType}
               value={nodeData.brokerType}
               onSearch={() => {}}
@@ -107,7 +108,7 @@ export const DrawerTopicEdit: FC<IDrawerTopicEditProps> = () => {
 
           {otherBroker && (
             <UIKitFormItem label="Broker URL">
-              <UIKitInput style={{borderRadius: '3px '}} isDisabled />
+              <UIKitInput style={{ borderRadius: '3px ' }} isDisabled />
             </UIKitFormItem>
           )}
         </UIKitForm>

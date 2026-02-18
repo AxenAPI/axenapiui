@@ -1,9 +1,10 @@
-import {Edge} from '@xyflow/react';
+import { Edge } from '@xyflow/react';
 import stc from 'string-to-color';
 
-import {formatBaseLinks} from '@/helpers/diagram-helpers/edge-formatters';
-import {getLinkType} from '@/helpers/diagram-helpers/edge-helpers';
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO, LinkDTO } from '@shared/openapi';
+
+import { formatBaseLinks } from '@/helpers/diagram-helpers/edge-formatters';
+import { getLinkType } from '@/helpers/diagram-helpers/edge-helpers';
 
 jest.mock('@/helpers/diagram-helpers/edge-helpers', () => ({
   getLinkType: jest.fn().mockReturnValue('custom'),
@@ -14,35 +15,41 @@ jest.mock('string-to-color', () => ({
   default: jest.fn().mockImplementation(id => `color-${id}`),
 }));
 
+const createMinimalGraph = (links: LinkDTO[] = []): EventGraphDTO => ({
+  name: 'test-graph',
+  nodes: [],
+  events: [],
+  tags: [],
+  errors: [],
+  links,
+});
+
 describe('/src/helpers/diagram-helpers/edge-formatters.tsx/formatBaseLinks', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test('should return empty array when links is undefined', () => {
-    const input: EventGraphDTO = {nodes: []};
+    const input: EventGraphDTO = createMinimalGraph(undefined);
     const result = formatBaseLinks(input);
     expect(result).toEqual([]);
   });
 
   test('should return empty array when links is empty', () => {
-    const input: EventGraphDTO = {nodes: [], links: []};
+    const input: EventGraphDTO = createMinimalGraph([]);
     const result = formatBaseLinks(input);
     expect(result).toEqual([]);
   });
 
   test('should transform links with all fields', () => {
-    const input: EventGraphDTO = {
-      nodes: [],
-      links: [
-        {
-          id: 'link1',
-          fromId: 'node1',
-          toId: 'node2',
-          eventId: 'event1',
-        },
-      ],
-    };
+    const input: EventGraphDTO = createMinimalGraph([
+      {
+        id: 'link1',
+        fromId: 'node1',
+        toId: 'node2',
+        eventId: 'event1',
+      },
+    ]);
 
     const expected: Edge[] = [
       {
@@ -62,21 +69,19 @@ describe('/src/helpers/diagram-helpers/edge-formatters.tsx/formatBaseLinks', () 
   });
 
   test('should generate id when not provided', () => {
-    const input: EventGraphDTO = {
-      nodes: [],
-      links: [
-        {
-          fromId: 'node1',
-          toId: 'node2',
-          eventId: 'event1',
-        },
-        {
-          fromId: 'node3',
-          toId: 'node4',
-          eventId: 'event2',
-        },
-      ],
-    };
+    const linksWithoutIds = [
+      {
+        fromId: 'node1',
+        toId: 'node2',
+        eventId: 'event1',
+      },
+      {
+        fromId: 'node3',
+        toId: 'node4',
+        eventId: 'event2',
+      },
+    ] as LinkDTO[];
+    const input: EventGraphDTO = createMinimalGraph(linksWithoutIds);
 
     const result = formatBaseLinks(input);
     expect(result[0].id).toBe('node1->node2.0');
@@ -84,17 +89,14 @@ describe('/src/helpers/diagram-helpers/edge-formatters.tsx/formatBaseLinks', () 
   });
 
   test('should handle links without eventId', () => {
-    const input: EventGraphDTO = {
-      nodes: [],
-      links: [
-        {
-          id: 'link1',
-          fromId: 'node1',
-          toId: 'node2',
-          eventId: undefined,
-        },
-      ],
-    };
+    const input: EventGraphDTO = createMinimalGraph([
+      {
+        id: 'link1',
+        fromId: 'node1',
+        toId: 'node2',
+        eventId: '',
+      },
+    ]);
 
     const expected: Edge[] = [
       {
@@ -104,7 +106,7 @@ describe('/src/helpers/diagram-helpers/edge-formatters.tsx/formatBaseLinks', () 
         type: 'custom',
         data: {
           color: 'color-',
-          eventId: undefined,
+          eventId: '',
         },
       },
     ];
@@ -115,23 +117,20 @@ describe('/src/helpers/diagram-helpers/edge-formatters.tsx/formatBaseLinks', () 
   });
 
   test('should handle multiple links', () => {
-    const input: EventGraphDTO = {
-      nodes: [],
-      links: [
-        {
-          id: 'link1',
-          fromId: 'node1',
-          toId: 'node2',
-          eventId: 'event1',
-        },
-        {
-          id: 'link2',
-          fromId: 'node2',
-          toId: 'node3',
-          eventId: 'event2',
-        },
-      ],
-    };
+    const input: EventGraphDTO = createMinimalGraph([
+      {
+        id: 'link1',
+        fromId: 'node1',
+        toId: 'node2',
+        eventId: 'event1',
+      },
+      {
+        id: 'link2',
+        fromId: 'node2',
+        toId: 'node3',
+        eventId: 'event2',
+      },
+    ]);
 
     const expected: Edge[] = [
       {
@@ -161,34 +160,28 @@ describe('/src/helpers/diagram-helpers/edge-formatters.tsx/formatBaseLinks', () 
   });
 
   test('should call getLinkType with correct parameters', () => {
-    const link = {
+    const link: LinkDTO = {
       id: 'link1',
       fromId: 'node1',
       toId: 'node2',
       eventId: 'event1',
     };
 
-    const input: EventGraphDTO = {
-      nodes: [],
-      links: [link],
-    };
+    const input: EventGraphDTO = createMinimalGraph([link]);
 
     formatBaseLinks(input);
     expect(getLinkType).toHaveBeenCalledWith(link, input);
   });
 
   test('should call stc with correct eventId', () => {
-    const input: EventGraphDTO = {
-      nodes: [],
-      links: [
-        {
-          id: 'link1',
-          fromId: 'node1',
-          toId: 'node2',
-          eventId: 'test-event',
-        },
-      ],
-    };
+    const input: EventGraphDTO = createMinimalGraph([
+      {
+        id: 'link1',
+        fromId: 'node1',
+        toId: 'node2',
+        eventId: 'test-event',
+      },
+    ]);
 
     formatBaseLinks(input);
     expect(stc).toHaveBeenCalledWith('test-event');

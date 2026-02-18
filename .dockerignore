@@ -1,0 +1,11 @@
+node_modules
+dist
+out
+.git
+*.log
+obsidian
+.husky
+.idea
+docs
+reports
+test

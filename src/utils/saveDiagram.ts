@@ -1,15 +1,8 @@
-import {Edge} from '@xyflow/react';
+import { ImportData } from '@/types/common';
 
-import {TNode} from '@/types/common';
-
-export const saveDiagram = (nodes: TNode[], edges: Edge[]) => {
-  const data = {
-    nodes,
-    edges,
-  };
-
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], {type: 'application/json'});
+export const saveDiagram = (importData: ImportData) => {
+  const json = JSON.stringify(importData, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement('a');

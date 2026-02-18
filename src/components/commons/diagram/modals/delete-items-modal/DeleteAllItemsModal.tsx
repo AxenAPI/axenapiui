@@ -1,18 +1,18 @@
-import {Modal as UIKitModal} from '@axenix/ui-kit';
+import { Modal as UIKitModal } from '@axenix/ui-kit';
 import clsx from 'clsx';
-import {useUnit} from 'effector-react';
-import {X} from 'tabler-icons-react';
+import { useUnit } from 'effector-react';
+import { X } from 'tabler-icons-react';
 
 import {
   $deleteItemsModal,
   closeDeleteItemsModal,
 } from '@/components/commons/diagram/model/modals-models/delete-items-modal/DeleteItemsModalModel';
-import {clearEventGraph} from '@/models/EventGraphModel';
+import { clearEventGraph } from '@/models/EventGraphModel';
 
 export const DeleteAllItemsModal = () => {
   const deleteItemsModal = useUnit($deleteItemsModal);
 
-  const {isOpen} = deleteItemsModal;
+  const { isOpen } = deleteItemsModal;
 
   const handleClose = () => {
     closeDeleteItemsModal();

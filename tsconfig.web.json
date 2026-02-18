@@ -1,0 +1,36 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "types": ["vite/client", "jest", "@testing-library/jest-dom"],
+    "isolatedModules": true,
+    "paths": {
+      "@app/*": ["./src/app/*"],
+      "@entities/*": ["./src/entities/*"],
+      "@features/*": ["./src/features/*"],
+      "@widgets/*": ["./src/widgets/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@shared/openapi": ["./src/shared/api/adapters/index.ts"],
+      "@/*": ["./src/*"],
+      "@common/*": ["common/*"],
+      "@packageJson": ["package.json"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "test/**/*.ts",
+    "test/**/*.tsx",
+    "common/**/*.ts",
+    "common/declarations/*.ts",
+    "src/types/declarations/*.d.ts",
+    "src/shared/api/adapters/index.ts",
+    "package.json",
+    "src/shared/openapi/backend-info.json"
+  ],
+  "exclude": ["build-scripts/**"]
+}

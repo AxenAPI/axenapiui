@@ -1,7 +1,8 @@
-import type {Node} from '@xyflow/react';
+import type { Node } from '@xyflow/react';
 
-import {EEdgeTypes} from '@/enums/common';
-import {EventGraphDTO, LinkDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO, LinkDTO } from '@shared/openapi';
+
+import { EEdgeTypes } from '@/enums/common';
 
 /**
  * Проверяет существование узлов с id === fromId и id === toId в наборе узлов графа.
@@ -43,7 +44,7 @@ export function getLinkType(link: LinkDTO, rawData: EventGraphDTO, isExpanded?: 
  * Возвращает id временного узла, связанного с разорванной связью
  */
 export function getRelatedGhostNodeId(ghostNodes: Node[], fromId: string, toId: string) {
-  return ghostNodes.find(({id}) => id === toId || id === fromId)?.id;
+  return ghostNodes.find(({ id }) => id === toId || id === fromId)?.id;
 }
 
 /**
@@ -65,8 +66,8 @@ export function generateDirectionString(fromId: string, toId: string) {
 /**
  * Вычисляет угол между начальной и конечной точками. Используется для поворота стрелки в связи.
  */
-export function getArrowAngle(params: {targetY: number; sourceY: number; targetX: number; sourceX: number}) {
-  const {sourceX, sourceY, targetX, targetY} = params;
+export function getArrowAngle(params: { targetY: number; sourceY: number; targetX: number; sourceX: number }) {
+  const { sourceX, sourceY, targetX, targetY } = params;
 
   return Math.atan2(targetY - sourceY, targetX - sourceX) * (180 / Math.PI);
 }

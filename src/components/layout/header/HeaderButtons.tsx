@@ -1,5 +1,5 @@
-import {Icon as UIKitIcon} from '@axenix/ui-kit';
-import {IconUserCircle} from '@tabler/icons-react';
+import { Icon as UIKitIcon } from '@axenix/ui-kit';
+import { IconUserCircle } from '@tabler/icons-react';
 
 export const HeaderButtons = () => (
   <div className="flex items-center gap-16">

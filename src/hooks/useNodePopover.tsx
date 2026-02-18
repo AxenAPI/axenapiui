@@ -1,22 +1,32 @@
-import {IconCodeDots, IconEdit, IconEyeOff, IconFileCode, IconListCheck, IconTrash} from '@tabler/icons-react';
-import {useUnit} from 'effector-react';
-import {useCallback} from 'react';
-import {Schema, SchemaOff} from 'tabler-icons-react';
+import {
+  IconCodeDots,
+  IconCursorText,
+  IconEdit,
+  IconEyeOff,
+  IconFileCode,
+  IconListCheck,
+  IconTrash,
+} from '@tabler/icons-react';
+import { useUnit } from 'effector-react';
+import { useCallback } from 'react';
+import { Schema, SchemaOff } from 'tabler-icons-react';
 
+import { NodeDTOTypeEnum } from '@shared/openapi';
+
+import { setRenamingNodeId } from '@/components/commons/diagram/model/DiagramModel';
 import {
   $expandableItems,
   expandItemByTopicId,
   shrinkItemByTopicId,
 } from '@/components/commons/diagram/model/ExpandableItemsModel';
-import {$hiddenItems, hideItem, showItem} from '@/components/commons/diagram/model/HiddenItemsModel';
-import {openDeleteSelectedItemsModal} from '@/components/commons/diagram/model/modals-models/delete-selected-items-modal/DeleteSelectedItemsModal';
-import {openDrawerEditTopic} from '@/components/commons/diagram/model/modals-models/drawer-edit-topic/DrawerEditTopicModel';
-import {openSpecificationModal} from '@/components/commons/diagram/model/modals-models/drawer-specification/SpecificationModalModel';
-import {openEditHttpNodeModal} from '@/components/commons/diagram/model/modals-models/edit-http-node-modal/EditHttpNodeModalModel';
-import {closePopoverMenu} from '@/components/commons/diagram/model/modals-models/popover/PopoverMenuModel';
-import {EMPTY_ARRAY} from '@/constants/common';
-import {NodeDTOTypeEnum} from '@/shared/api/event-graph-api';
-import {TCustomNodeData} from '@/types/common';
+import { $hiddenItems, hideItem, showItem } from '@/components/commons/diagram/model/HiddenItemsModel';
+import { openDeleteSelectedItemsModal } from '@/components/commons/diagram/model/modals-models/delete-selected-items-modal/DeleteSelectedItemsModal';
+import { openDrawerEditTopic } from '@/components/commons/diagram/model/modals-models/drawer-edit-topic/DrawerEditTopicModel';
+import { openSpecificationModal } from '@/components/commons/diagram/model/modals-models/drawer-specification/SpecificationModalModel';
+import { openEditHttpNodeModal } from '@/components/commons/diagram/model/modals-models/edit-http-node-modal/EditHttpNodeModalModel';
+import { closePopoverMenu } from '@/components/commons/diagram/model/modals-models/popover/PopoverMenuModel';
+import { EMPTY_ARRAY, IS_READ_ONLY } from '@/constants/common';
+import { TCustomNodeData } from '@/types/common';
 
 export const useNodePopover = (id: string, data: TCustomNodeData) => {
   const hiddenItems = useUnit($hiddenItems);
@@ -34,6 +44,11 @@ export const useNodePopover = (id: string, data: TCustomNodeData) => {
 
   const handleOpenSpecificationEdit = useCallback(() => {
     openSpecificationModal(id);
+    closePopoverMenu();
+  }, [id]);
+
+  const handleRenameNode = useCallback(() => {
+    setRenamingNodeId(id);
     closePopoverMenu();
   }, [id]);
 
@@ -68,6 +83,8 @@ export const useNodePopover = (id: string, data: TCustomNodeData) => {
   const getExtraPopoverItems = (nodeType: string) => {
     if (nodeType === NodeDTOTypeEnum.Http) return EMPTY_ARRAY;
 
+    const expandableItem = expandableItems.find(el => el.topicId === id);
+
     const baseExtraPopoverItems = [
       {
         key: 'editEvent',
@@ -83,16 +100,15 @@ export const useNodePopover = (id: string, data: TCustomNodeData) => {
       },
     ];
 
-    if (nodeType === NodeDTOTypeEnum.Topic && expandableItems.find(el => el.topicId === id)) {
+    if (nodeType === NodeDTOTypeEnum.Topic && expandableItem) {
       return [
-        ...baseExtraPopoverItems,
+        // TODO: временно скрываем кнопки из меню
+        // ...baseExtraPopoverItems,
         {
           key: 'showEvents',
-          label: expandableItems.find(el => el.topicId === id).isExpanded ? 'Hide events' : 'Show events',
-          onClick: expandableItems.find(el => el.topicId === id).isExpanded
-            ? () => shrinkItemByTopicId(id)
-            : () => expandItemByTopicId(id),
-          icon: expandableItems.find(el => el.topicId === id).isExpanded ? <SchemaOff /> : <Schema />,
+          label: expandableItem.isExpanded ? 'Hide events' : 'Show events',
+          onClick: expandableItem.isExpanded ? () => shrinkItemByTopicId(id) : () => expandItemByTopicId(id),
+          icon: expandableItem.isExpanded ? <SchemaOff /> : <Schema />,
         },
       ];
     }
@@ -100,8 +116,14 @@ export const useNodePopover = (id: string, data: TCustomNodeData) => {
     return baseExtraPopoverItems;
   };
 
-  const popoverItems = [
+  const standartPopoverItems = [
     getFirstPopoverItem(data.nodeType),
+    {
+      key: 'rename',
+      label: 'Rename',
+      onClick: () => handleRenameNode(),
+      icon: <IconCursorText />,
+    },
     {
       key: 'hide',
       label: 'Hide',
@@ -117,5 +139,16 @@ export const useNodePopover = (id: string, data: TCustomNodeData) => {
     },
   ];
 
-  return {popoverItems};
+  const readOnlyPopoverItems = [
+    {
+      key: 'hide',
+      label: 'Hide',
+      onClick: () => (hiddenItems.includes(id) ? showItem(id) : hideItem(id)),
+      icon: <IconEyeOff />,
+    },
+  ];
+
+  const popoverItems = !IS_READ_ONLY ? standartPopoverItems : readOnlyPopoverItems;
+
+  return { popoverItems };
 };

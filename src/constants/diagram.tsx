@@ -1,10 +1,11 @@
-import {XYPosition} from '@xyflow/react';
-import {v4 as uuidv4} from 'uuid';
+import { XYPosition } from '@xyflow/react';
+import { v4 as uuidv4 } from 'uuid';
 
-import {EMPTY_ARRAY, EMPTY_CHAR} from '@/constants/common';
-import {EConnectionType, EObjectToConnect} from '@/enums/common';
-import {EventGraphDTO, NodeDTO} from '@/shared/api/event-graph-api';
-import {ILinkForm} from '@/types/common';
+import { EventGraphDTO, NodeDTO } from '@shared/openapi';
+
+import { EMPTY_ARRAY, EMPTY_CHAR } from '@/constants/common';
+import { EConnectionType, EObjectToConnect } from '@/enums/common';
+import { ILinkForm } from '@/types/common';
 
 /**
  * Фиксированная высота узла
@@ -17,12 +18,15 @@ export const NODE_WIDTH = 187;
 
 export const GROUP_NODE_PADDING = 10;
 export const GROUP_NODE_GAP = 20;
-export const INITIAL_POSITION_INSIDE_GROUP: XYPosition = {x: 10, y: 10};
+export const INITIAL_POSITION_INSIDE_GROUP: XYPosition = { x: 10, y: 10 };
+export const HISTORY_DEPTH = -10;
+export const INITIAL_HISTORY_INDEX = 0;
 
 export const initialLinksForm: ILinkForm = {
-  fromId: null,
-  toId: null,
-  eventId: null,
+  id: EMPTY_CHAR,
+  fromId: EMPTY_CHAR,
+  toId: EMPTY_CHAR,
+  eventId: EMPTY_CHAR,
   connectionType: EConnectionType.PRODUCE,
   objectToConnect: EObjectToConnect.TOPIC,
 };
@@ -42,6 +46,7 @@ export const elkLayoutOptions = {
 };
 
 export const INITIAL_SERVICE_NODE: NodeDTO = {
+  id: EMPTY_CHAR,
   name: EMPTY_CHAR,
   belongsToGraph: EMPTY_ARRAY,
   type: 'SERVICE',

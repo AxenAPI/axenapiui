@@ -1,4 +1,4 @@
-import {FC, useState} from 'react';
+import { FC, useState } from 'react';
 
 type SelectableItem = {
   id: string;
@@ -10,7 +10,7 @@ interface SelectableListProps {
   onSelectionChange?: (selectedIds: string[]) => void;
 }
 
-export const SelectableList: FC<SelectableListProps> = ({items, onSelectionChange}) => {
+export const SelectableList: FC<SelectableListProps> = ({ items, onSelectionChange }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>(items.map(item => item.id));
 
   const handleToggle = (id: string) => {

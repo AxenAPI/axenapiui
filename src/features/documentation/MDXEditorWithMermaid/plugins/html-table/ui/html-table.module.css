@@ -1,0 +1,277 @@
+/* Main table editor wrapper */
+.tableEditor {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Table editor cells - add borders only to data cells, not tool cells */
+.tableEditor td:not([data-tool-cell]):not(.toolCell),
+.tableEditor th:not([data-tool-cell]):not(.tableToolsColumn) {
+  border: 1px solid #d0d7de;
+  padding: 6px 13px;
+  position: relative;
+}
+
+/* Remove borders from footer */
+.tableEditor tfoot td {
+  border: none !important;
+}
+
+:global(.dark) .tableEditor td:not([data-tool-cell]):not(.toolCell),
+:global(.dark) .tableEditor th:not([data-tool-cell]):not(.tableToolsColumn) {
+  border-color: #30363d;
+}
+
+/* Cell alignment styles */
+.centeredCell {
+  text-align: center;
+}
+
+.leftAlignedCell {
+  text-align: left;
+}
+
+.rightAlignedCell {
+  text-align: right;
+}
+
+.justifiedCell {
+  text-align: justify;
+}
+
+/* Tool columns and cells (handles) */
+.tableToolsColumn {
+  width: 24px;
+  background-color: transparent;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.toolCell {
+  width: 24px;
+  background-color: transparent;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Hover effect for tool cells to hint interactivity */
+.toolCell:hover,
+.tableToolsColumn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.toolCell[data-active='true'] {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Data tool cell alignment */
+[data-tool-cell] {
+  justify-items: right;
+}
+
+/* Icon buttons within tool cells */
+.iconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconButton:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Add row/column buttons */
+.addColumnButton,
+.addRowButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.addColumnButton:hover,
+.addRowButton:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Popover Trigger */
+.tableColumnEditorTrigger {
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tableColumnEditorTrigger:hover,
+.tableColumnEditorTrigger[data-active='true'] {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Highlighted state for active editors during hover */
+.tableColumnEditorTrigger[data-active='true'] {
+  background-color: rgba(37, 99, 235, 0.15) !important; /* Blue highlight for active editors */
+  border-radius: 4px;
+}
+
+:global(.dark) .tableColumnEditorTrigger[data-active='true'] {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Popover Content - THE FIX for missing background */
+.tableColumnEditorPopoverContent {
+  background-color: white; /* Ensure visibility */
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  padding: 4px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+/* Dark mode support if applicable */
+:global(.dark) .tableColumnEditorPopoverContent {
+  background-color: #1f2937;
+  border-color: #374151;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.tableColumnEditorToolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Toolbar buttons inside popover */
+.tableColumnEditorToolbar button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tableColumnEditorToolbar button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .tableColumnEditorToolbar button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Separator in toolbar */
+.tableColumnEditorToolbar [role='separator'] {
+  width: 1px;
+  background-color: #e0e0e0;
+  margin: 0 4px;
+  height: 20px;
+}
+
+:global(.dark) .tableColumnEditorToolbar [role='separator'] {
+  background-color: #374151;
+}
+
+.toggleGroupRoot {
+  display: flex;
+  gap: 2px;
+}
+
+/* Active state for toggle items (alignment) */
+.toggleGroupRoot button[data-state='on'] {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: black;
+}
+
+:global(.dark) .toggleGroupRoot button[data-state='on'] {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.popoverArrow {
+  fill: white;
+}
+
+:global(.dark) .popoverArrow {
+  fill: #1f2937;
+}
+
+/* Viewer styles */
+.htmlRawTableViewer {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.htmlRawTableViewer td,
+.htmlRawTableViewer th {
+  border: 1px solid #d0d7de;
+  padding: 6px 13px;
+}
+
+:global(.dark) .htmlRawTableViewer td,
+:global(.dark) .htmlRawTableViewer th {
+  border-color: #30363d;
+}
+
+/* Active Editing Cell */
+.activeCell {
+  outline: 2px solid #2563eb; /* Blue highlight */
+  outline-offset: -1px;
+}
+
+.selectedCell {
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* ContentEditable in cells - ensure visible borders and proper styling */
+.tableEditor [contenteditable='true'] {
+  outline: none;
+  min-height: 20px;
+  display: block;
+  width: 100%;
+}
+
+.tableEditor td[data-active='true'],
+.tableEditor th[data-active='true'] {
+  background-color: rgba(37, 99, 235, 0.05);
+  border-color: #2563eb;
+  border-width: 2px;
+}
+
+/* Table error state */
+.tableError {
+  color: #dc2626;
+  padding: 8px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  background-color: #fef2f2;
+  font-size: 14px;
+}
+
+:global(.dark) .tableError {
+  color: #f87171;
+  border-color: #7f1d1d;
+  background-color: #450a0a;
+}

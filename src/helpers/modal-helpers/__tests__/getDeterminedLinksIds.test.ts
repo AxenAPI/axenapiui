@@ -1,9 +1,9 @@
-import {v4 as uuidV4} from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 
-import {EConnectionType, EObjectToConnect} from '@/enums/common';
-import {ILinkForm} from '@/types/common';
+import { EConnectionType, EObjectToConnect } from '@/enums/common';
+import { ILinkForm } from '@/types/common';
 
-import {getDeterminedLinkIds} from '../getDeterminedLinkIds';
+import { getDeterminedLinkIds } from '../getDeterminedLinkIds';
 
 jest.mock('uuid');
 
@@ -20,6 +20,7 @@ describe('getDeterminedLinkIds', () => {
 
   it('should correctly determine IDs for HTTP_NODE connection type', () => {
     const link: ILinkForm = {
+      id: 'test-id',
       fromId: 'service-id',
       toId: 'http-node-id',
       eventId: 'event-id',
@@ -39,6 +40,7 @@ describe('getDeterminedLinkIds', () => {
 
   it('should correctly determine IDs for CONSUME connection type', () => {
     const link: ILinkForm = {
+      id: 'test-id',
       fromId: 'service-id',
       toId: 'consumer-id',
       eventId: 'event-id',
@@ -58,6 +60,7 @@ describe('getDeterminedLinkIds', () => {
 
   it('should correctly determine IDs for PRODUCE connection type', () => {
     const link: ILinkForm = {
+      id: 'test-id',
       fromId: 'producer-id',
       toId: 'service-id',
       eventId: 'event-id',

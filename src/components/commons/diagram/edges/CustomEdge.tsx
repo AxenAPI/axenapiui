@@ -1,17 +1,17 @@
-import {IconCircleArrowRight} from '@tabler/icons-react';
-import {BaseEdge, EdgeLabelRenderer, getBezierPath, type EdgeProps} from '@xyflow/react';
+import { IconCircleArrowRight } from '@tabler/icons-react';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
 import clsx from 'clsx';
-import {useUnit} from 'effector-react';
-import React, {type FC} from 'react';
+import { useUnit } from 'effector-react';
 
-import {getArrowAngle} from '@/helpers/diagram-helpers/edge-helpers';
-import {useEdgeSelection} from '@/hooks/useEdgeSelection';
+import type { TEdgeProps } from '@/constants/reactflow';
+import { getArrowAngle } from '@/helpers/diagram-helpers/edge-helpers';
+import { useEdgeSelection } from '@/hooks/useEdgeSelection';
 
-import {$hiddenItems} from '../model/HiddenItemsModel';
+import { $hiddenItems } from '../model/HiddenItemsModel';
 
-export type ICustomEdgeProps = Partial<EdgeProps>;
-
-export const CustomEdge: FC<ICustomEdgeProps> = ({
+export type ICustomEdgeProps = TEdgeProps;
+// TODO: data кастомная пропса надо понять что она должна в себе нести
+export function CustomEdge({
   data,
   id,
   sourcePosition,
@@ -20,9 +20,9 @@ export const CustomEdge: FC<ICustomEdgeProps> = ({
   targetPosition,
   targetX,
   targetY,
-}) => {
+}: ICustomEdgeProps) {
   const hiddenItems = useUnit($hiddenItems);
-  const {isEdgeSelected, onEdgeClick} = useEdgeSelection(id);
+  const { isEdgeSelected, onEdgeClick } = useEdgeSelection(id);
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -33,12 +33,12 @@ export const CustomEdge: FC<ICustomEdgeProps> = ({
     targetPosition,
   });
 
-  const angle = getArrowAngle({targetY, sourceY, targetX, sourceX});
+  const angle = getArrowAngle({ targetY, sourceY, targetX, sourceX });
 
   const hidden = hiddenItems.includes(data.eventId as string);
 
   return (
-    <React.Fragment>
+    <>
       <g onClick={onEdgeClick} data-testid="customEdge">
         <BaseEdge
           id={id}
@@ -67,11 +67,11 @@ export const CustomEdge: FC<ICustomEdgeProps> = ({
           >
             <IconCircleArrowRight
               className={clsx('fill-diagram-bg hover:cursor-pointer')}
-              style={{color: `${data.color}`}}
+              style={{ color: `${data.color}` }}
             />
           </div>
         </EdgeLabelRenderer>
       </g>
-    </React.Fragment>
+    </>
   );
-};
+}

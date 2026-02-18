@@ -1,0 +1,118 @@
+appId: com.axenix.axenapi
+productName: AxenApi
+
+icon: public/images/favicon.png
+
+compression: store
+
+directories:
+  buildResources: build
+  output: dist
+
+files:
+  - filter:
+      - out/**/*
+      - package.json
+      - '!src/**/*'
+      - '!electron/**/*'
+      - '!common/**/*'
+      - '!openapi/**/*'
+      - '!chart/**/*'
+      - '!build-scripts/**/*'
+      - '!docs/**/*'
+      - '!local-packages/**/*'
+      - '!log/**/*'
+      - '!logs/**/*'
+      - '!nginx/**/*'
+      - '!obsidian/**/*'
+      - '!reports/**/*'
+      - '!scripts/**/*'
+      - '!test/**/*'
+
+asar: true
+asarUnpack:
+  - '**/*.node'
+  #- '**/jar-files/jdk/bin/*' # Распаковываем бинарники JDK из ASAR для корректного запуска
+
+extraResources:
+  - from: ./jar-files/
+    to: jar-files/
+    filter:
+      - '*.jar'
+  - from: './jar-files/jdk/${os}/${arch}/'
+    to: jar-files/jdk/
+    filter:
+      - '**/*'
+      - '!jmods/**/*'
+      - '!legal/**/*'
+      - '!lib/src.zip'
+
+win:
+  target:
+    - target: nsis
+  executableName: AxenApi
+  icon: public/images/favicon.ico
+  signAndEditExecutable: false
+  signExts: []
+  forceCodeSigning: false
+
+nsis:
+  artifactName: ${productName}-v${version}.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  allowElevation: true
+  createStartMenuShortcut: true
+  createDesktopShortcut: true
+  deleteAppDataOnUninstall: true
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: true
+  warningsAsErrors: false
+
+mac:
+  target:
+    - target: pkg
+      arch:
+        - arm64
+        - x64
+  identity: null
+  notarize: false
+
+pkg:
+  artifactName: ${productName}-v${version}-${arch}.${ext}
+  installLocation: /Applications
+  allowAnywhere: false
+  allowCurrentUserHome: false
+  allowRootDirectory: false
+  scripts: build-scripts/pkg/postinstall.sh
+
+linux:
+  target:
+    - target: AppImage
+    - target: deb
+  executableName: AxenApi
+
+appImage:
+  artifactName: ${productName}-v${version}.${ext}
+
+deb:
+  artifactName: ${productName}-v${version}.${ext}
+  depends:
+    - libnss3
+    - libatk1.0-0
+    - libasound2
+    - libxss1
+    - libgtk-3-0
+    - libgbm1
+
+# Опции npm
+npmRebuild: true
+
+# Автообновления
+# publish:
+#   provider: generic
+#   url: https://example.com/auto-updates
+
+# Альтернативный источник Electron
+electronDownload:
+  mirror: https://npmmirror.com/mirrors/electron/

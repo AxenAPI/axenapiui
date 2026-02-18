@@ -17,3 +17,9 @@ yarn-error.log*
 
 .idea
 .vscode
+
+jar-files
+
+data
+chart
+reports

@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom';
-import {render, screen} from '@testing-library/react';
-import {MemoryRouter} from 'react-router-dom';
+import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
-import {Header} from '@/components/layout/header/Header';
+import { Header } from '@/components/layout/header/Header';
 
 describe('/src/components/layout/header/Header.tsx', () => {
   test('renders the Header component with correct structure', () => {

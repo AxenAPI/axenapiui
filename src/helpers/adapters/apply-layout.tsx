@@ -1,15 +1,16 @@
-import {Edge, type Node, XYPosition} from '@xyflow/react';
-import {type ElkNode} from 'elkjs/lib/elk.bundled.js';
+import { Edge, type Node, XYPosition } from '@xyflow/react';
+import { type ElkNode } from 'elkjs/lib/elk.bundled.js';
 
-import {EMPTY_ARRAY} from '@/constants/common';
-import {elkLayoutOptions, GROUP_NODE_PADDING, NODE_HEIGHT, NODE_WIDTH} from '@/constants/diagram';
-import {calculateGroupDimensions, findElkNode} from '@/helpers/node-helpers';
-import {checkIsDesktopMode} from '@/helpers/utils';
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
-import {TExpandableItem, TGroupNode, type TNode} from '@/types/common';
+import { layoutGraph } from '@shared/helpers/elk-client';
+import { EventGraphDTO } from '@shared/openapi';
 
-import {adaptDiagramLinks} from './adapt-diagram-links';
-import {adaptDiagramNodes} from './adapt-diagram-nodes';
+import { EMPTY_ARRAY } from '@/constants/common';
+import { elkLayoutOptions, GROUP_NODE_PADDING, NODE_HEIGHT, NODE_WIDTH } from '@/constants/diagram';
+import { calculateGroupDimensions, findElkNode } from '@/helpers/node-helpers';
+import { TExpandableItem, TGroupNode, type TNode } from '@/types/common';
+
+import { adaptDiagramLinks } from './adapt-diagram-links';
+import { adaptDiagramNodes } from './adapt-diagram-nodes';
 
 /**
  * Применение ELK для автоматического позиционирования с учетом типов узлов
@@ -27,10 +28,10 @@ export async function applyLayout(
   const edges = adaptDiagramLinks(eventGraph, expandableItems);
 
   // Создаем мапу дочерних элементов для каждого родительского элемента
-  const parentChildrenMap = nodes.reduce<Record<string, {children: string[]; childCount: number}>>((acc, node) => {
+  const parentChildrenMap = nodes.reduce<Record<string, { children: string[]; childCount: number }>>((acc, node) => {
     if (node.parentId) {
       if (!acc[node.parentId]) {
-        acc[node.parentId] = {children: [], childCount: 0};
+        acc[node.parentId] = { children: [], childCount: 0 };
       }
 
       acc[node.parentId].children.push(node.id);
@@ -71,21 +72,7 @@ export async function applyLayout(
     })),
   };
 
-  let layout: ElkNode = null;
-
-  // для десктопа elk инитим в preload.ts, для веба здесь.
-  if (checkIsDesktopMode()) {
-    try {
-      layout = await window.elk.layout(elkGraph);
-    } catch {
-      throw new Error('ELK is not properly initialized');
-    }
-  } else {
-    const ELK = (await import('elkjs/lib/elk.bundled.js')).default;
-    const elk = new ELK();
-
-    layout = await elk.layout(elkGraph);
-  }
+  const layout: ElkNode = await layoutGraph(elkGraph);
 
   const existingGroups = existingNodes.filter(el => el.type === 'group') as TGroupNode[];
   const formattedNodes = nodes.map(node => {
@@ -104,7 +91,7 @@ export async function applyLayout(
 
     // Для раскрывающихся элементов подсчитываем положение заранее
     if ((node.parentId || node.type === 'group') && 'position' in node) {
-      position = node.position;
+      position = node.position!;
     }
 
     const isExpandedTopic = expandableItems.find(item => item.topicId === node.id)?.isExpanded;
@@ -126,8 +113,8 @@ export async function applyLayout(
       position,
       style: {
         ...node.style,
-        width: elkNode.width,
-        height: elkNode.height,
+        width: elkNode?.width,
+        height: elkNode?.height,
       },
     };
   }) as TNode[];

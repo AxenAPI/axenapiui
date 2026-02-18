@@ -1,19 +1,23 @@
-import {expect, Locator, Page} from '@playwright/test';
-
 import path from 'path';
 
-import {test} from '../electron.fixture';
-import {getDiagramState, getPanelDeleteButton, uploadFile} from '../helpers/diagramHelpers';
-import {getSidebarState} from '../helpers/sidebarHelpers';
+import { expect, Locator, Page } from '@playwright/test';
+
+import { test } from '../electron.fixture';
+import { getDiagramState, getPanelDeleteButton, uploadFile } from '../helpers/diagramHelpers';
+import { getSidebarState } from '../helpers/sidebarHelpers';
 
 const getDeletingElements = async (diagramNodes: Locator, sidebarItems: Locator, type: 'service' | 'topic') => {
-  // Находим первый узел и берем его имя
   const deletingNode = diagramNodes.first();
   const deletingNodeName = await deletingNode.getByTestId(`${type}NodeName`).textContent();
+
+  if (!deletingNodeName) {
+    throw new Error('Could not find deleting node name');
+  }
+
   // По имени находим элемент этого узла в левой панели
   const deletingSidebarItem = sidebarItems.getByText(deletingNodeName);
 
-  return {deletingNode, deletingSidebarItem, deletingNodeName};
+  return { deletingNode, deletingSidebarItem, deletingNodeName };
 };
 
 const validateStateAfterNodeDelete = async (
@@ -25,7 +29,7 @@ const validateStateAfterNodeDelete = async (
   type: 'service' | 'topic' = 'service'
 ) => {
   // Финальное состояние диаграммы
-  const {serviceItems: finalServiceItems, topicItems: finalTopicItems} = await getSidebarState(page);
+  const { serviceItems: finalServiceItems, topicItems: finalTopicItems } = await getSidebarState(page);
   const {
     disconnectedEdgesCount,
     edgesCount: finalEdgesCount,
@@ -64,9 +68,9 @@ const validateStateAfterNodeDelete = async (
 
 test.describe('scenarios for deleting nodes', () => {
   let page: Page;
-  test.beforeEach(async ({page: appPage}) => {
+  test.beforeEach(async ({ page: appPage }) => {
     page = appPage;
-    await page.setViewportSize({width: 1920, height: 1080});
+    await page.setViewportSize({ width: 1920, height: 1080 });
 
     const filePath = path.join(
       __dirname,
@@ -83,9 +87,9 @@ test.describe('scenarios for deleting nodes', () => {
 
   test('should delete an element via node context menu', async () => {
     // Начальное состояние диаграммы
-    const {serviceItems, serviceItemsCount} = await getSidebarState(page);
-    const {edgesCount, serviceNodeCount, serviceNodes} = await getDiagramState(page);
-    const {deletingNode: deletingService, deletingSidebarItem: deletingServiceSidebar} = await getDeletingElements(
+    const { serviceItems, serviceItemsCount } = await getSidebarState(page);
+    const { edgesCount, serviceNodeCount, serviceNodes } = await getDiagramState(page);
+    const { deletingNode: deletingService, deletingSidebarItem: deletingServiceSidebar } = await getDeletingElements(
       serviceNodes,
       serviceItems,
       'service'
@@ -93,8 +97,8 @@ test.describe('scenarios for deleting nodes', () => {
 
     await deletingServiceSidebar.scrollIntoViewIfNeeded();
 
-    await deletingService.click({button: 'right', force: true});
-    await page.locator('.ant-popover >> .ant-menu-item', {hasText: 'Delete'}).click();
+    await deletingService.click({ button: 'right', force: true });
+    await page.locator('.ant-popover >> .ant-menu-item', { hasText: 'Delete' }).click();
 
     const modal = page.locator('.ant-modal');
 
@@ -104,16 +108,16 @@ test.describe('scenarios for deleting nodes', () => {
       `Deleting objects is an irreversible action. All relationships with these objects will be lost.`
     );
     // Удаляем только узел, связь оставяем
-    await modal.locator('.ant-btn', {hasText: /^Delete object$/}).click();
+    await modal.locator('.ant-btn', { hasText: /^Delete object$/ }).click();
     await expect(modal).not.toBeVisible();
 
     await validateStateAfterNodeDelete(page, serviceItemsCount, serviceNodeCount, edgesCount);
   });
 
   test('should delete an element and relationships', async () => {
-    const {serviceItems, serviceItemsCount} = await getSidebarState(page);
-    const {edgesCount, serviceNodeCount, serviceNodes} = await getDiagramState(page);
-    const {deletingNode: deletingService, deletingSidebarItem: deletingServiceSidebar} = await getDeletingElements(
+    const { serviceItems, serviceItemsCount } = await getSidebarState(page);
+    const { edgesCount, serviceNodeCount, serviceNodes } = await getDiagramState(page);
+    const { deletingNode: deletingService, deletingSidebarItem: deletingServiceSidebar } = await getDeletingElements(
       serviceNodes,
       serviceItems,
       'service'
@@ -121,23 +125,23 @@ test.describe('scenarios for deleting nodes', () => {
 
     await deletingServiceSidebar.scrollIntoViewIfNeeded();
 
-    await deletingService.click({button: 'right', force: true});
-    await page.locator('.ant-popover >> .ant-menu-item', {hasText: 'Delete'}).click();
+    await deletingService.click({ button: 'right', force: true });
+    await page.locator('.ant-popover >> .ant-menu-item', { hasText: 'Delete' }).click();
 
     const modal = page.locator('.ant-modal');
 
     await expect(modal).toBeVisible();
     // Удаляем узел и связь
-    await modal.locator('.ant-btn', {hasText: /^Delete object and relationships$/}).click();
+    await modal.locator('.ant-btn', { hasText: /^Delete object and relationships$/ }).click();
     await expect(modal).not.toBeVisible();
 
     await validateStateAfterNodeDelete(page, serviceItemsCount, serviceNodeCount, edgesCount, false);
   });
 
   test('should not make changes on cancel', async () => {
-    const {serviceItems} = await getSidebarState(page);
-    const {serviceNodes} = await getDiagramState(page);
-    const {deletingNode: deletingService, deletingSidebarItem: deletingServiceSidebar} = await getDeletingElements(
+    const { serviceItems } = await getSidebarState(page);
+    const { serviceNodes } = await getDiagramState(page);
+    const { deletingNode: deletingService, deletingSidebarItem: deletingServiceSidebar } = await getDeletingElements(
       serviceNodes,
       serviceItems,
       'service'
@@ -145,46 +149,46 @@ test.describe('scenarios for deleting nodes', () => {
 
     await deletingServiceSidebar.scrollIntoViewIfNeeded();
 
-    await deletingService.click({button: 'right', force: true});
-    await page.locator('.ant-popover >> .ant-menu-item', {hasText: 'Delete'}).click();
+    await deletingService.click({ button: 'right', force: true });
+    await page.locator('.ant-popover >> .ant-menu-item', { hasText: 'Delete' }).click();
 
     const modal = page.locator('.ant-modal');
 
     await expect(modal).toBeVisible();
-    await modal.locator('.ant-btn', {hasText: /^Cancel$/}).click();
+    await modal.locator('.ant-btn', { hasText: /^Cancel$/ }).click();
 
     await expect(deletingService).toBeVisible();
     await expect(deletingServiceSidebar).toBeVisible();
   });
 
   test('should delete an element via the context menu in the sidebar', async () => {
-    const {topicItems, topicItemsCount} = await getSidebarState(page);
-    const {edgesCount, topicNodeCount, topicNodes} = await getDiagramState(page);
-    const {deletingSidebarItem: deletingTopicSidebar} = await getDeletingElements(topicNodes, topicItems, 'topic');
+    const { topicItems, topicItemsCount } = await getSidebarState(page);
+    const { edgesCount, topicNodeCount, topicNodes } = await getDiagramState(page);
+    const { deletingSidebarItem: deletingTopicSidebar } = await getDeletingElements(topicNodes, topicItems, 'topic');
 
-    await deletingTopicSidebar.getByText('commonConsumeKafka', {exact: true}).click({button: 'right'});
+    await deletingTopicSidebar.getByText('commonConsumeKafka', { exact: true }).click({ button: 'right' });
 
     const dropdownMenu = page.locator('.ant-dropdown-menu');
     await expect(dropdownMenu).toBeVisible();
     await expect(dropdownMenu).not.toBeHidden();
     await expect(dropdownMenu).toBeAttached();
 
-    const deleteBtn = dropdownMenu.getByRole('menuitem', {name: 'Delete'});
-    await deleteBtn.waitFor({state: 'visible', timeout: 5000});
+    const deleteBtn = dropdownMenu.getByRole('menuitem', { name: 'Delete' });
+    await deleteBtn.waitFor({ state: 'visible', timeout: 5000 });
     await deleteBtn.hover();
-    await deleteBtn.click({force: true});
+    await deleteBtn.click({ force: true });
 
     const modal = page.locator('.ant-modal');
     await expect(modal).toBeVisible();
-    await modal.getByRole('button', {name: /^Delete object$/}).click();
+    await modal.getByRole('button', { name: /^Delete object$/ }).click();
 
     await validateStateAfterNodeDelete(page, topicItemsCount, topicNodeCount, edgesCount, true, 'topic');
   });
 
   test('should be successfully deleted via the "Delete" button after selecting node', async () => {
-    const {serviceItems, serviceItemsCount} = await getSidebarState(page);
-    const {edgesCount, serviceNodeCount, serviceNodes} = await getDiagramState(page);
-    const {deletingNode: deletingService, deletingSidebarItem: deletingServiceSidebar} = await getDeletingElements(
+    const { serviceItems, serviceItemsCount } = await getSidebarState(page);
+    const { edgesCount, serviceNodeCount, serviceNodes } = await getDiagramState(page);
+    const { deletingNode: deletingService, deletingSidebarItem: deletingServiceSidebar } = await getDeletingElements(
       serviceNodes,
       serviceItems,
       'service'
@@ -201,16 +205,16 @@ test.describe('scenarios for deleting nodes', () => {
     const modal = page.locator('.ant-modal');
 
     await expect(modal).toBeVisible();
-    await modal.locator('.ant-btn', {hasText: /^Delete object$/}).click();
+    await modal.locator('.ant-btn', { hasText: /^Delete object$/ }).click();
 
     await validateStateAfterNodeDelete(page, serviceItemsCount, serviceNodeCount, edgesCount);
   });
 
   test('should be successfully deleted via the "Delete" button after selecting multiple nodes', async () => {
-    const {serviceItems, serviceItemsCount, topicItems, topicItemsCount} = await getSidebarState(page);
-    const {edgesCount, serviceNodeCount, serviceNodes, topicNodeCount, topicNodes} = await getDiagramState(page);
-    const {deletingNode: deletingService} = await getDeletingElements(serviceNodes, serviceItems, 'service');
-    const {deletingNode: deletingTopic} = await getDeletingElements(topicNodes, topicItems, 'topic');
+    const { serviceItems, serviceItemsCount, topicItems, topicItemsCount } = await getSidebarState(page);
+    const { edgesCount, serviceNodeCount, serviceNodes, topicNodeCount, topicNodes } = await getDiagramState(page);
+    const { deletingNode: deletingService } = await getDeletingElements(serviceNodes, serviceItems, 'service');
+    const { deletingNode: deletingTopic } = await getDeletingElements(topicNodes, topicItems, 'topic');
 
     const deleteBtn = getPanelDeleteButton(page);
     await expect(deleteBtn).toBeDisabled();
@@ -226,10 +230,10 @@ test.describe('scenarios for deleting nodes', () => {
     const modal = page.locator('.ant-modal');
 
     await expect(modal).toBeVisible();
-    await modal.locator('.ant-btn', {hasText: /^Delete object$/}).click();
+    await modal.locator('.ant-btn', { hasText: /^Delete object$/ }).click();
 
     // Финальное состояние диаграммы
-    const {serviceItems: finalServiceItems, topicItems: finalTopicItems} = await getSidebarState(page);
+    const { serviceItems: finalServiceItems, topicItems: finalTopicItems } = await getSidebarState(page);
     const {
       disconnectedEdgesCount,
       edgesCount: finalEdgesCount,

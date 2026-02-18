@@ -1,0 +1,7 @@
+@layer utilities {
+  .side-bar {
+    .ant-menu {
+      border: none;
+    }
+  }
+}

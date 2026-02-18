@@ -1,4 +1,8 @@
-/* eslint-disable no-bitwise */
+// Этот файл реализует алгоритм кодирования, похожий на Base64, для PlantUML.
+// Использование побитовых операторов (|, <<, >>, &) является намеренным и
+// необходимым для логики алгоритма. Отключение правила 'no-bitwise'
+// для этого файла — это осознанное решение.
+
 function encode64(data: string): string {
   const r = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
   let result = '';
@@ -25,8 +29,7 @@ function deflate(input: string): Promise<Uint8Array> {
   // Используем встроенный CompressionStream, доступен в современных браузерах
   // fallback может быть нужен для старых браузеров
   if (!('CompressionStream' in window)) {
-    // eslint-disable-next-line prefer-promise-reject-errors
-    return Promise.reject('CompressionStream API is not supported in this browser');
+    return Promise.reject(new Error('CompressionStream API is not supported in this browser'));
   }
   const cs = new CompressionStream('deflate');
   const writer = cs.writable.getWriter();
@@ -47,5 +50,3 @@ export async function encodePlantUML(text: string): Promise<string> {
 
   return encode64(binaryString);
 }
-
-/* eslint-enable no-bitwise */

@@ -1,16 +1,16 @@
-import {BaseEdge, EdgeLabelRenderer, getBezierPath, type EdgeProps} from '@xyflow/react';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
 import clsx from 'clsx';
-import {useUnit} from 'effector-react';
-import React, {type FC} from 'react';
-import {AlertCircle} from 'tabler-icons-react';
+import { useUnit } from 'effector-react';
+import { AlertCircle } from 'tabler-icons-react';
 
-import {useEdgeSelection} from '@/hooks/useEdgeSelection';
+import type { TEdgeProps } from '@/constants/reactflow';
+import { useEdgeSelection } from '@/hooks/useEdgeSelection';
 
-import {$hiddenItems} from '../model/HiddenItemsModel';
+import { $hiddenItems } from '../model/HiddenItemsModel';
 
-export type IDisconnectedEdgeProps = Partial<EdgeProps>;
+export type IDisconnectedEdgeProps = TEdgeProps;
 
-export const DisconnectedEdge: FC<IDisconnectedEdgeProps> = ({
+export function DisconnectedEdge({
   data,
   id,
   sourcePosition,
@@ -19,9 +19,9 @@ export const DisconnectedEdge: FC<IDisconnectedEdgeProps> = ({
   targetPosition,
   targetX,
   targetY,
-}) => {
+}: IDisconnectedEdgeProps) {
   const hiddenItems = useUnit($hiddenItems);
-  const {isEdgeSelected, onEdgeClick} = useEdgeSelection(id);
+  const { isEdgeSelected, onEdgeClick } = useEdgeSelection(id);
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -35,7 +35,7 @@ export const DisconnectedEdge: FC<IDisconnectedEdgeProps> = ({
   const hidden = hiddenItems.includes(data.eventId as string);
 
   return (
-    <React.Fragment>
+    <>
       <g onClick={onEdgeClick} data-testid="disconnected-edge">
         <BaseEdge
           id={id}
@@ -63,6 +63,6 @@ export const DisconnectedEdge: FC<IDisconnectedEdgeProps> = ({
           </div>
         </EdgeLabelRenderer>
       </g>
-    </React.Fragment>
+    </>
   );
-};
+}

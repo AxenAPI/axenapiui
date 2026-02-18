@@ -1,57 +1,133 @@
-# Axenapi Ui
+# Axenapi UI
 
-## Launch desktop/web app:
+**Axenapi** — это **центральная платформа для совместного проектирования систем**, своего рода «инженерный Confluence», ориентированный на аналитиков.
 
-The application can be run as a desktop (dev/prod) or web(dev/prod) app.
+Основная миссия — служить **единым источником правды**, где все проектные артефакты (архитектурные схемы, API-контракты, документация) рождаются, связываются и развиваются в одном месте. Платформа решает проблему рассинхронизации, когда документация и код существуют отдельно и неизбежно устаревают.
 
-- install npm from https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
-- `npm install --global yarn` - install yarn.
-- `yarn` - install dependencies.
-- `yarn start` - launch desktop app in dev mode with connection to cloud server.
-- `yarn start:web` - launch web app on dev server (http://localhost:3000).
-- `yarn build` - build production app version.
-- `yarn build:dev` - build development app version.
-- `yarn build:prod` - build production app version.
+Все артефакты хранятся в **Git-репозитории**, что обеспечивает версионирование, отслеживание истории и возможность параллельной работы.
 
-Build artifacts available at `dist/`.
+## Ключевые возможности
 
-## Compile desktop app distribution:
+- **Визуальное проектирование:** Создание и редактирование схем архитектуры (`eventGraph`) и асинхронных API в визуальном редакторе.
+- **Единый источник правды в Git:** Хранение всей проектной информации (схемы, документация) в Git с возможностью управления ветками, коммитами и MR.
+- **Генерация артефактов:** Автоматическое создание JSON-схем (под OpenAPI), спецификаций и других артефактов на основе спроектированных моделей.
+- **Работа с документацией:** Встроенный Markdown-редактор и утилита для импорта данных из Яндекс.Вики.
+- **Автоматизация и Тестирование:** Интеграция со Swagger UI для тестирования API и инструменты для автоматической генерации задач в трекере (MCP).
 
-The app can be compile with connection to the cloud or local backend service. JDK and service .jar file are included in the distribution.
+## Технологический стек
 
-- `yarn package:local-server` | `yarn package:cloud-server` - package app into a platform-specific executable bundle with local or cloud server.
-- `yarn make:local-server` | `yarn make:cloud-server` - make distributables for app with local or cloud server (in accordance with package).
+Приложение имеет гибридную архитектуру, состоящую из десктопного клиента и локального сервера.
 
-Artifacts available at: `out/make`.
+- **Платформа:** **Electron** используется как каркас десктопного приложения. Его основной процесс управляет жизненным циклом Java-сервера и предоставляет доступ к нативным API.
+- **Бэкенд:** Локальный **Java-сервис** (`axenapi-web.jar`), который выполняет всю основную бизнес-логику (генерация артефактов, работа с Git).
+- **Фронтенд:**
+  - **Фреймворк:** **React** (с TypeScript) для построения пользовательского интерфейса.
+  - **Архитектура:** **Feature-Sliced Design (FSD)** для организации кодовой базы.
+  - **Управление состоянием:** **Effector** для управления состоянием и бизнес-логикой.
+- **Сборка и упаковка:**
+  - **Сборщик:** **Vite** (с интеграцией через `electron-vite`).
+  - **Упаковщик:** **Electron-builder** для создания дистрибутивов под разные ОС.
 
-## for devops
+## Начало работы
 
-1. get newest snapshot version of axenapi-web from nexux (version 1.0.0)
-2. `yarn package:local-server`
-3. `yarn make:local-server`
-4. save Artifacts available at: `out/make` in nexus.
+Для запуска приложения вам понадобятся [Node.js](https://nodejs.org/) и [Yarn](https://yarnpkg.com/).
 
-## Run E2E tests:
+1. **Установите зависимости:**
 
-Test files directory: `/test/specs`
+   ```bash
+   yarn
+   ```
 
-- `yarn package:cloud-server` - package app.
-- `yarn test:e2e` - run all tests.
+2. **Запустите приложение в режиме разработки:** Эта команда автоматически обновит локальный Java-сервис, перегенерирует API-клиент и запустит приложение.
+   ```bash
+   yarn start
+   ```
 
-NOTE: to simplify writing e2e tests you can use `await page.pause()` inside your test.
+## Сборка приложения
 
-## Run unit tests:
+Для сборки дистрибутива десктопного приложения выполните команду:
 
-Test files directory: `*/__tests__`
+```bash
+  yarn build:win
+```
 
-- `yarn test` - run tests.
+```bash
+  yarn build:macArm64
+```
 
-## Generate API:
+Готовый дистрибутив будет находиться в папке `out/make`.
 
-- [Download](https://www.oracle.com/java/technologies/downloads/#java23) the latest Java
-- `yarn generate-api` - run api generation
+## Тестирование
 
-## Mutation testing
+- **Юнит-тесты (Jest):**
 
-- `test:mutation` - run mutation testing
-  The report is located in the directory: `/reports/mutation`
+  ```bash
+  yarn test
+  ```
+
+- **E2E-тесты (Playwright):**
+  ```bash
+  yarn test:e2e
+  ```
+
+## Полезные команды
+
+- **Линтинг (ESLint):** Проверка стиля кода и поиск ошибок.
+
+  ```bash
+  yarn lint
+  ```
+
+- **Проверка типов (TypeScript):** Запускает проверку типов TypeScript во всем проекте без создания сборки.
+
+  ```bash
+  yarn check-types
+  ```
+
+- **Генерация API-клиента:** Если вам нужно вручную перегенерировать клиент на основе OpenAPI спецификации:
+
+  ```bash
+  yarn generate-api
+  ```
+
+- **Скачивание актуального Jar и schema.yaml:** Скачивает актуальную версию `axenapi-web.jar` и `schema.yaml` из Nexus-репозитория. Это необходимо для корректной работы генерации API и локального сервера.
+  ```bash
+  yarn update-jar
+  ```
+
+## Процесс релиза (на стадии реализации)
+
+Этот гайд описывает шаги для создания и публикации новой версии приложения.
+
+### Шаг 1: Обновление версии
+
+1. Убедитесь, что вы находитесь на свежей версии `main` ветки.
+2. Для обновления версии приложения используйте команду `npm version`. Она автоматически обновит `package.json` и создаст соответствующий Git-тег.
+
+- `npm version patch` — для мелких исправлений (например, 2.2.0 -> 2.2.1).
+- `npm version minor` — для новой функциональности (например, 2.2.0 -> 2.3.0).
+- `npm version major` — для крупных, ломающих изменений (например, 2.2.0 -> 3.0.0).
+
+### Шаг 2: Сборка приложения
+
+1. Перед сборкой убедитесь, что у вас последняя версия `jar`-файла:
+   ```bash
+   yarn update-jar
+   ```
+2. Запустите сборку дистрибутива:
+   ```bash
+   yarn make:local-server
+   ```
+   Собранные файлы будут находиться в папке `out/make`.
+
+### Шаг 3: Публикация
+
+1. Отправьте изменения и тег в Git-репозиторий:
+   ```bash
+   git push && git push --tags
+   ```
+2. Для автоматической публикации релиза (например, на GitHub Releases) выполните:
+   ```bash
+   yarn publish
+   ```
+   Эта команда использует `electron`, который загружает артефакты сборки согласно конфигурации в `electron-builder.yaml`.

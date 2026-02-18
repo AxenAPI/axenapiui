@@ -1,13 +1,14 @@
-import {Icon as UIKitIcon} from '@axenix/ui-kit';
-import {IconServerCog} from '@tabler/icons-react';
+import { Icon as UIKitIcon } from '@axenix/ui-kit';
+import { IconServerCog } from '@tabler/icons-react';
 import clsx from 'clsx';
-import {ElkNode} from 'elkjs/lib/elk.bundled.js';
+import { ElkNode } from 'elkjs/lib/elk.bundled.js';
 
-import {EMPTY_ARRAY} from '@/constants/common';
-import {GROUP_NODE_GAP, NODE_HEIGHT, NODE_WIDTH} from '@/constants/diagram';
-import {IconMap, NodeColorMap, NodeSelectedColorMap} from '@/helpers/nodes-value-map';
-import {EventGraphDTO, NodeDTO, NodeDTOBrokerTypeEnum, NodeDTOTypeEnum} from '@/shared/api/event-graph-api';
-import {TCustomNodeData} from '@/types/common';
+import { EventGraphDTO, NodeDTO, NodeDTOBrokerTypeEnum, NodeDTOTypeEnum } from '@shared/openapi';
+
+import { EMPTY_ARRAY } from '@/constants/common';
+import { GROUP_NODE_GAP, NODE_HEIGHT, NODE_WIDTH } from '@/constants/diagram';
+import { IconMap, NodeColorMap, NodeSelectedColorMap } from '@/helpers/nodes-value-map';
+import { TCustomNodeData } from '@/types/common';
 
 // TODO покрыть тестами
 /**
@@ -45,9 +46,9 @@ export const getCustomNodeClassName = (
 export const getInputClassName = (isReadOnly: boolean) =>
   clsx(
     'w-full max-w-[7.688rem] p-0',
-    'overflow-hidden border-none text-ellipsis whitespace-nowrap outline-none',
-    'focus:border-none focus:outline-none',
-    isReadOnly && 'cursor-pointer'
+    'overflow-hidden  text-ellipsis whitespace-nowrap ',
+    isReadOnly &&
+      'cursor-pointer border-none outline-none focus:border-none focus:outline-none select-none selection:bg-transparent'
   );
 
 /**
@@ -68,7 +69,7 @@ export const generateBaseGroupNodeId = (id: NodeDTO['id']) => `${id}-group`;
 /**
  * Возвращает размеры узла группы на основе количества элементов внутри него
  */
-export function calculateGroupDimensions(childNodesCount: number): {width: number; height: number} {
+export function calculateGroupDimensions(childNodesCount: number): { width: number; height: number } {
   return {
     width: NODE_WIDTH + GROUP_NODE_GAP,
     height: childNodesCount * (NODE_HEIGHT + GROUP_NODE_GAP),
@@ -79,7 +80,7 @@ export function calculateGroupDimensions(childNodesCount: number): {width: numbe
  * Рекурсивно ищет узел (node) с указанным идентификатором (nodeId) в созданном layout.
  * Поиск выполняется сначала среди дочерних элементов первого уровня, затем среди вложенных дочерних элементов.
  * */
-export function findElkNode(layout: ElkNode, nodeId: string): ElkNode {
+export function findElkNode(layout: ElkNode, nodeId: string): ElkNode | null {
   const rootNode = layout.children?.find(n => n.id === nodeId);
   if (rootNode) return rootNode;
 
@@ -99,7 +100,7 @@ export function isNodeTopic(eventGraph: EventGraphDTO, nodeId: NodeDTO['id']): b
  * Берет, тип ноды из графа событий.
  */
 export function getNodeType(eventGraph: EventGraphDTO, nodeId: string) {
-  const {nodes} = eventGraph;
+  const { nodes } = eventGraph;
 
   if (nodes) {
     return nodes.find(node => node.id === nodeId)?.type;

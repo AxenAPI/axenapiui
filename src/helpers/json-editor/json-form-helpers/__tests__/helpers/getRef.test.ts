@@ -1,4 +1,4 @@
-import {getRefName} from '@/helpers/json-editor';
+import { getRefName } from '@/helpers/json-editor';
 
 describe('/src/helpers/json-editor/helpers.ts/getRefName', () => {
   test('should extract model name from standard OpenAPI reference path', () => {

@@ -1,8 +1,10 @@
-import {type Node} from '@xyflow/react';
+import { logger } from '@shared/lib/logger';
 
-import {removeGhostNode, setEdges, setNodes} from '@/components/commons/diagram/model/DiagramModel';
+import { clearGhostNodes, setEdges } from '@/components/commons/diagram/model/DiagramModel';
+import { setEventGraph } from '@/models/EventGraphModel';
+import { ImportData } from '@/types/common';
 
-export const openDiagram = (ghostNodes: Node[]) => {
+export const openDiagram = () => {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.json';
@@ -14,16 +16,15 @@ export const openDiagram = (ghostNodes: Node[]) => {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const json = JSON.parse(reader.result as string);
+        const json = JSON.parse(reader.result as string) as ImportData;
         if (json.nodes && json.edges) {
-          ghostNodes.forEach(ghostNode => {
-            removeGhostNode(ghostNode.id);
-          });
-          setNodes(json.nodes);
-          setEdges(json.edges);
+          const { edges, ...eventGraph } = json;
+          clearGhostNodes();
+          setEventGraph(eventGraph);
+          setEdges(edges);
         }
       } catch (err) {
-        console.log(err);
+        logger.log(err);
       }
     };
     reader.readAsText(file);

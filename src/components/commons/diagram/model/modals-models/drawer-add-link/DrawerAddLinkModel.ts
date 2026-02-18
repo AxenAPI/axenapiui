@@ -1,9 +1,9 @@
-import {createEvent, createStore} from 'effector';
+import { createEvent, createStore } from 'effector';
 
 export const openDrawerAddLink = createEvent<string>();
 export const closeDrawerAddLink = createEvent();
 
-export const $drawerAddLink = createStore<{isOpen: boolean; itemId?: string}>({
+export const $drawerAddLink = createStore<{ isOpen: boolean; itemId?: string }>({
   isOpen: false,
   itemId: '',
 })

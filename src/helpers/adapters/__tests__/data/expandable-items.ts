@@ -1,6 +1,7 @@
-import {getExpandableLinkId} from '@/helpers/diagram-helpers/edge-helpers';
-import {Consume2Events1Topic} from '@/shared/data-mock';
-import {TExpandableItem} from '@/types/common';
+import { Consume2Events1Topic } from '@shared/data-mock';
+
+import { getExpandableLinkId } from '@/helpers/diagram-helpers/edge-helpers';
+import { TExpandableItem } from '@/types/common';
 
 export const expandableItemMockConsume2Events1Topic: TExpandableItem = {
   compoundLinkId: getExpandableLinkId(Consume2Events1Topic.links[0]),

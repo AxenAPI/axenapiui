@@ -1,4 +1,4 @@
-import {createEvent, createStore} from 'effector';
+import { createEvent, createStore } from 'effector';
 
 export const resetFilter = createEvent();
 export const addTagToFilter = createEvent<string>();

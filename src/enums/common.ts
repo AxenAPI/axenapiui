@@ -44,3 +44,8 @@ export enum EExportTypes {
   DOC = 'DOC',
   PDF = 'PDF',
 }
+
+export enum EAuthorizationType {
+  TOKEN = 'TOKEN',
+  LOGIN = 'LOGIN',
+}

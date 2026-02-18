@@ -1,0 +1,18 @@
+.nodeInfoModal {
+  --node-info-modal-top: 176px;
+  --node-info-modal-bottom: 100px;
+  --node-info-modal-content-height: calc(100vh - var(--node-info-modal-top) - var(--node-info-modal-bottom));
+
+  position: fixed;
+  top: var(--node-info-modal-top);
+  bottom: var(--node-info-modal-bottom);
+  max-height: var(--node-info-modal-content-height);
+  right: 1.5rem;
+  max-width: 378px;
+
+  :global(.graph-node-tabs .ant-tabs-tabpane-active) {
+    display: flex;
+    flex-direction: column;
+    height: calc(var(--node-info-modal-content-height) - 100px);
+  }
+}

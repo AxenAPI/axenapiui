@@ -1,7 +1,8 @@
-import {EMPTY_ARRAY} from '@/constants/common';
-import {formatExpandableNodes, formatSimpleNodes} from '@/helpers/diagram-helpers/node-formatters';
-import {EventDTO, EventGraphDTO} from '@/shared/api/event-graph-api';
-import {TExpandableItem, type TNode, TOptionalPosition} from '@/types/common';
+import { EventDTO, EventGraphDTO } from '@shared/openapi';
+
+import { EMPTY_ARRAY } from '@/constants/common';
+import { formatExpandableNodes, formatSimpleNodes } from '@/helpers/diagram-helpers/node-formatters';
+import { TExpandableItem, type TNode, TOptionalPosition } from '@/types/common';
 
 /**
  * Адаптирует узлы графа для использования в диаграмме.
@@ -15,7 +16,7 @@ export function adaptDiagramNodes(
   const expandedItems = expandableItems?.filter(el => el.isExpanded);
 
   // Форматируем как обычные узлы если нет расширяемых элементов
-  if (!expandableItems || !expandedItems.length) {
+  if (!expandedItems || !expandedItems.length) {
     return formatSimpleNodes(rawData.nodes);
   }
 

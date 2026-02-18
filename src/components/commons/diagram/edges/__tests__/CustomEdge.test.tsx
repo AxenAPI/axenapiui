@@ -1,13 +1,19 @@
-import {render, screen} from '@testing-library/react';
-import {Position, ReactFlowProvider} from '@xyflow/react';
+import { render, screen } from '@testing-library/react';
+import { Position, ReactFlowProvider } from '@xyflow/react';
 
-import {ICustomEdgeProps, CustomEdge} from '../CustomEdge';
+import { CustomEdge, ICustomEdgeProps } from '../CustomEdge';
 
 describe('/src/components/diagram/CustomEdge.tsx', () => {
   const mockProps: ICustomEdgeProps = {
     id: '12345678-90ab-cdef-1234-567890abcdef->b2c3d4e5-f678-9012-3456-7890abcdef09',
+    source: 'a',
+    target: 'b',
     data: {
       color: '#b4b947',
+      isExpanded: false,
+      topicId: 'mock-topic-id',
+      compoundLinkId: 'mock-compound-link-id',
+      relatedItems: [],
     },
     sourcePosition: Position.Right,
     sourceX: 290,

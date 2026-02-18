@@ -1,18 +1,18 @@
-import {Modal as UIKitModal} from '@axenix/ui-kit';
+import { Modal as UIKitModal } from '@axenix/ui-kit';
 import clsx from 'clsx';
-import {useUnit} from 'effector-react';
-import {X} from 'tabler-icons-react';
+import { useUnit } from 'effector-react';
+import { X } from 'tabler-icons-react';
 
-import {DeleteSelectedItemsModalFooter} from '@/components/commons/diagram/modals/delete-items-modal/DeleteSelectedItemsFooter';
+import { DeleteSelectedItemsModalFooter } from '@/components/commons/diagram/modals/delete-items-modal/DeleteSelectedItemsFooter';
 import {
   $deleteSelectedItemsModal,
   closeDeleteSelectedItemsModal,
 } from '@/components/commons/diagram/model/modals-models/delete-selected-items-modal/DeleteSelectedItemsModal';
-import {$eventGraph, removeLinks, removeNodes, removeNodeWithConnectedLinks} from '@/models/EventGraphModel';
+import { $eventGraph, removeLinks, removeNodes, removeNodeWithConnectedLinks } from '@/models/EventGraphModel';
 
 export const DeleteSelectedItemsModal = () => {
   const eventGraph = useUnit($eventGraph);
-  const {isOpen, selectedItemIds} = useUnit($deleteSelectedItemsModal);
+  const { isOpen, selectedItemIds } = useUnit($deleteSelectedItemsModal);
   const isOnlyLinksSelected = selectedItemIds?.every(selectedId =>
     eventGraph?.links?.some(link => link.id === selectedId)
   );

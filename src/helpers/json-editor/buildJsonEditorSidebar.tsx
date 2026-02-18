@@ -1,9 +1,11 @@
-import {Dropdown} from '@axenix/ui-kit';
-import {ItemType} from 'antd/lib/menu/interface';
+import { Dropdown } from '@axenix/ui-kit';
+import { ItemType } from 'antd/lib/menu/interface';
 
-import {removeEvent} from '@/models/EventGraphModel';
-import {selectMenuItem} from '@/models/JsonEditorModel';
-import {EventDTO, EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventDTO, EventGraphDTO } from '@shared/openapi';
+
+import { IS_READ_ONLY } from '@/constants/common';
+import { removeEvent } from '@/models/EventGraphModel';
+import { selectMenuItem } from '@/models/JsonEditorModel';
 
 export const buildJsonEditorSidebar = (eventGraph: EventGraphDTO) => {
   const events: EventDTO[] = eventGraph?.events?.map(event => event) || [];
@@ -13,18 +15,22 @@ export const buildJsonEditorSidebar = (eventGraph: EventGraphDTO) => {
     label: (
       <Dropdown
         trigger={['contextMenu']}
-        menu={{
-          items: [
-            {
-              label: 'Delete',
-              key: `del:${event.id}`,
-              onClick: e => {
-                e.domEvent.stopPropagation();
-                removeEvent(event.id);
-              },
-            },
-          ],
-        }}
+        menu={
+          !IS_READ_ONLY
+            ? {
+                items: [
+                  {
+                    label: 'Delete',
+                    key: `del:${event.id}`,
+                    onClick: e => {
+                      e.domEvent.stopPropagation();
+                      removeEvent(event.id);
+                    },
+                  },
+                ],
+              }
+            : undefined
+        }
       >
         {event.name}
       </Dropdown>

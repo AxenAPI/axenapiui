@@ -1,7 +1,8 @@
-import {EMPTY_ARRAY} from '@/constants/common';
-import {getExpandableLinkId} from '@/helpers/diagram-helpers/edge-helpers';
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
-import type {TExpandableItem} from '@/types/common';
+import { EventGraphDTO } from '@shared/openapi';
+
+import { EMPTY_ARRAY } from '@/constants/common';
+import { getExpandableLinkId } from '@/helpers/diagram-helpers/edge-helpers';
+import type { TExpandableItem } from '@/types/common';
 
 // TODO покрыть тестом
 export function getExpandableItems(
@@ -18,10 +19,13 @@ export function getExpandableItems(
     if (map.has(key)) {
       const entry = map.get(key); // Получаем текущее значение
       entry.count += 1; // Обновляем счетчик
-      entry.relatedItems = [...entry.relatedItems, {linkId: link.id, eventId: link.eventId}]; // Обновляем массив связей
+      entry.relatedItems = [...entry.relatedItems, { linkId: link.id, eventId: link.eventId }]; // Обновляем массив связей
       map.set(key, entry); // Обновляем запись в Map
     } else {
-      map.set(key, {count: 1, relatedItems: [{linkId: link.id, eventId: link.eventId}]}); // Инициализируем новую запись
+      map.set(key, {
+        count: 1,
+        relatedItems: [{ linkId: link.id, eventId: link.eventId }],
+      }); // Инициализируем новую запись
     }
 
     return map;
@@ -30,7 +34,7 @@ export function getExpandableItems(
   // Фильтруем связи с count > 1 и извлекаем ID узлов-топиков
   return Array.from(connectionsMap.entries())
     .filter(([, value]) => value.count > 1) // Оставляем только связи с count > 1
-    .flatMap(([key, {relatedItems}]) =>
+    .flatMap(([key, { relatedItems }]) =>
       key
         .split('&') // Разделяем ключи на отдельные ID
         .filter((id: string) => topicNodeIds.includes(id)) // Оставляем только ID, которые являются узлами-топиками

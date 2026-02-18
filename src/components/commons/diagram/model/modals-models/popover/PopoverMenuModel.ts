@@ -1,9 +1,9 @@
-import {createEvent, createStore} from 'effector';
+import { createEvent, createStore } from 'effector';
 
 export const openPopoverMenu = createEvent<string>();
 export const closePopoverMenu = createEvent();
 
-export const $popoverMenu = createStore<{isOpen: boolean; itemId?: string}>({
+export const $popoverMenu = createStore<{ isOpen: boolean; itemId?: string }>({
   isOpen: false,
   itemId: '',
 })

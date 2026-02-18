@@ -6,15 +6,16 @@
     "generators": {
       "v1.0": {
         "generatorName": "typescript-axios",
-        "output": "./src/shared/api/event-graph-api",
+        "output": "./src/shared/openapi",
         "skipValidateSpec": true,
-        "inputSpec": "./src/shared/api/schema.yaml",
+        "inputSpec": "./openapi/axenapi-be.yml",
         "typeMappings": {
           "set": "Array"
         },
         "additionalProperties": {
           "supportsES6": true,
-          "useSingleRequestParameter": true
+          "useSingleRequestParameter": true,
+          "apiFiles": "allInOne"
         }
       }
     }

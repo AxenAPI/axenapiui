@@ -1,4 +1,4 @@
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO } from '@shared/openapi';
 
 export const Consume2Events1TopicNoGroup: EventGraphDTO = {
   name: 'consume_one_event_service',
@@ -9,7 +9,7 @@ export const Consume2Events1TopicNoGroup: EventGraphDTO = {
       belongsToGraph: ['a1b2c3d4-e5f6-7890-1234-567890abcdef'],
       name: 'consume_one_event_service',
       type: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
       tags: ['event1', 'event2'],
     },
     {
@@ -27,7 +27,7 @@ export const Consume2Events1TopicNoGroup: EventGraphDTO = {
       toId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
       eventId: 'c3d4e5f6-7890-1234-5678-90abcdef0123',
-      group: null,
+      group: undefined,
       tags: ['event1'],
     },
     {
@@ -35,7 +35,7 @@ export const Consume2Events1TopicNoGroup: EventGraphDTO = {
       toId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
       eventId: 'b61208c8-09d4-4e4d-89c0-b1da4e8b7d17',
-      group: null,
+      group: undefined,
       tags: ['event2'],
     },
   ],

@@ -1,5 +1,5 @@
-import {getPropertiesLength} from '@/helpers/json-editor';
-import {TSchema} from '@/types/common';
+import { getPropertiesLength } from '@/helpers/json-editor';
+import { TSchema } from '@/types/common';
 
 describe('/src/helpers/json-editor/helpers.ts/getPropertiesLength', () => {
   test('should return null for undefined/null input', () => {
@@ -13,9 +13,9 @@ describe('/src/helpers/json-editor/helpers.ts/getPropertiesLength', () => {
 
   test('should return null for non-object schemas', () => {
     // Arrange
-    const refSchema = {$ref: '#/components/schemas/User'};
-    const stringSchema: TSchema = {type: 'string'};
-    const numberSchema: TSchema = {type: 'number'};
+    const refSchema = { $ref: '#/components/schemas/User' };
+    const stringSchema: TSchema = { type: 'string' };
+    const numberSchema: TSchema = { type: 'number' };
 
     // Act & Assert
     expect(getPropertiesLength(refSchema)).toBeNull();
@@ -25,8 +25,8 @@ describe('/src/helpers/json-editor/helpers.ts/getPropertiesLength', () => {
 
   test('should return null for schema objects without properties', () => {
     // Arrange
-    const emptyObjectSchema: TSchema = {type: 'object'};
-    const additionalPropsSchema: TSchema = {type: 'object', additionalProperties: true};
+    const emptyObjectSchema: TSchema = { type: 'object' };
+    const additionalPropsSchema: TSchema = { type: 'object', additionalProperties: true };
 
     // Act & Assert
     expect(getPropertiesLength(emptyObjectSchema)).toBeNull();
@@ -37,14 +37,14 @@ describe('/src/helpers/json-editor/helpers.ts/getPropertiesLength', () => {
     // Arrange
     const singlePropSchema: TSchema = {
       type: 'object',
-      properties: {name: {type: 'string'}},
+      properties: { name: { type: 'string' } },
     };
     const multiPropSchema: TSchema = {
       type: 'object',
       properties: {
-        id: {type: 'number'},
-        name: {type: 'string'},
-        active: {type: 'boolean'},
+        id: { type: 'number' },
+        name: { type: 'string' },
+        active: { type: 'boolean' },
       },
     };
 
@@ -68,7 +68,7 @@ describe('/src/helpers/json-editor/helpers.ts/getPropertiesLength', () => {
     // Arrange
     const schemaWithAdditionalProps: TSchema = {
       type: 'object',
-      properties: {id: {type: 'number'}},
+      properties: { id: { type: 'number' } },
       additionalProperties: true,
     };
 
@@ -83,7 +83,7 @@ describe('/src/helpers/json-editor/helpers.ts/getPropertiesLength', () => {
       properties: {
         user: {
           type: 'object',
-          properties: {name: {type: 'string'}},
+          properties: { name: { type: 'string' } },
         },
       },
     };

@@ -1,13 +1,13 @@
-import {expect, Page} from '@playwright/test';
-
 import path from 'path';
 
-import {test} from '../electron.fixture';
-import {getDiagramState, uploadFile} from '../helpers/diagramHelpers';
+import { expect, Page } from '@playwright/test';
+
+import { test } from '../electron.fixture';
+import { getDiagramState, uploadFile } from '../helpers/diagramHelpers';
 
 test.describe('scenario for deleting all elements', () => {
   let page: Page;
-  test.beforeAll(async ({page: appPage}) => {
+  test.beforeAll(async ({ page: appPage }) => {
     page = appPage;
 
     const filePath = path.join(
@@ -19,9 +19,9 @@ test.describe('scenario for deleting all elements', () => {
 
   test('should delete all elements from diagram', async () => {
     // Ожидаем успешного импорта
-    await page.locator('.ant-notification-notice-success').waitFor({state: 'visible'});
+    await page.locator('.ant-notification-notice-success').waitFor({ state: 'visible' });
 
-    const {edgesCount, serviceNodeCount, topicNodeCount} = await getDiagramState(page);
+    const { edgesCount, serviceNodeCount, topicNodeCount } = await getDiagramState(page);
 
     expect(edgesCount).toBeGreaterThan(0);
     expect(serviceNodeCount).toBeGreaterThan(0);
@@ -34,7 +34,7 @@ test.describe('scenario for deleting all elements', () => {
     await deleteAllModal.waitFor();
     await expect(deleteAllModal).toBeInViewport();
 
-    await page.locator('button', {hasText: 'Delete all'}).click();
+    await page.locator('button', { hasText: 'Delete all' }).click();
     const {
       edgesCount: finalEdgesCount,
       serviceNodeCount: finalServiceNodeCount,
@@ -45,7 +45,9 @@ test.describe('scenario for deleting all elements', () => {
     expect(finalServiceNodeCount).toBe(0);
     expect(finalTopicNodeCount).toBe(0);
 
-    const successDeleteNotification = page.locator('.ant-notification-notice-success', {hasText: 'Deletion completed'});
+    const successDeleteNotification = page.locator('.ant-notification-notice-success', {
+      hasText: 'Deletion completed',
+    });
     await expect(successDeleteNotification).toBeVisible();
   });
 });

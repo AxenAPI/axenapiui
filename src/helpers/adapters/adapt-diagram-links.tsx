@@ -1,12 +1,13 @@
-import {Edge} from '@xyflow/react';
+import { Edge } from '@xyflow/react';
 import stc from 'string-to-color';
 
-import {EEdgeTypes} from '@/enums/common';
-import {formatBaseLinks} from '@/helpers/diagram-helpers/edge-formatters';
-import {generateDirectionString, getExpandableLinkId, getLinkType} from '@/helpers/diagram-helpers/edge-helpers';
-import {getExpandedEventNodeId} from '@/helpers/node-helpers';
-import {EventGraphDTO, LinkDTO} from '@/shared/api/event-graph-api';
-import {TExpandableItem} from '@/types/common';
+import { EventGraphDTO, LinkDTO } from '@shared/openapi';
+
+import { EEdgeTypes } from '@/enums/common';
+import { formatBaseLinks } from '@/helpers/diagram-helpers/edge-formatters';
+import { generateDirectionString, getExpandableLinkId, getLinkType } from '@/helpers/diagram-helpers/edge-helpers';
+import { getExpandedEventNodeId } from '@/helpers/node-helpers';
+import { TExpandableItem } from '@/types/common';
 
 /**
  * Проверяет, была ли уже обработана пара (fromId, toId) или обратная (toId, fromId)
@@ -54,35 +55,39 @@ export function adaptDiagramLinks(rawData: EventGraphDTO, expandableItems?: TExp
           source: el.fromId,
           target: el.toId,
           type: linkType,
-          data: {...currentExpandedItem},
+          data: { ...currentExpandedItem },
         });
       } else {
-        const data = !isExpanded ? getLinkData(el) : {...currentExpandedItem};
+        const data = !isExpanded ? getLinkData(el) : { ...currentExpandedItem };
+        const id = isExpanded ? getExpandableLinkId(el) : (el.id ?? getExpandableLinkId(el));
 
         edges.push({
-          id: !isExpanded ? el.id : getExpandableLinkId(el),
+          id,
           source: el.fromId,
           target: el.toId,
           type: isExpanded ? EEdgeTypes.SIMPLE : linkType,
-          data: {...data},
+          data: { ...data },
         });
       }
     }
 
-    if (isExpanded) {
+    if (isExpanded && el.id) {
       const relatedItem = currentExpandedItem.relatedItems.find(item => item.linkId === el.id);
-      const getNodeId = (id: string) =>
-        currentExpandedItem.topicId === id
-          ? getExpandedEventNodeId(relatedItem.eventId, currentExpandedItem.topicId)
-          : id;
 
-      edges.push({
-        id: el.id,
-        source: getNodeId(el.fromId),
-        target: getNodeId(el.toId),
-        type: linkType,
-        data: getLinkData(el),
-      });
+      if (relatedItem) {
+        const getNodeId = (id: string) =>
+          currentExpandedItem.topicId === id
+            ? getExpandedEventNodeId(relatedItem.eventId, currentExpandedItem.topicId)
+            : id;
+
+        edges.push({
+          id: el.id,
+          source: getNodeId(el.fromId),
+          target: getNodeId(el.toId),
+          type: linkType,
+          data: getLinkData(el),
+        });
+      }
     }
   });
 

@@ -1,8 +1,9 @@
-import {createEvent, createStore, sample} from 'effector';
+import { createEvent, createStore, sample } from 'effector';
 
-import {$filterTags} from '@/components/commons/diagram/model/FilterTagsModel';
-import {$eventGraph} from '@/models/EventGraphModel';
-import {EventDTO, NodeDTO} from '@/shared/api/event-graph-api';
+import { EventDTO, EventGraphDTO, NodeDTO } from '@shared/openapi';
+
+import { $filterTags } from '@/components/commons/diagram/model/FilterTagsModel';
+import { $eventGraph } from '@/models/EventGraphModel';
 
 // Создание событий для управления видимостью элементов
 export const showAll = createEvent(); // Сбрасываем хранилище (очищаем скрытые элементы)
@@ -33,11 +34,9 @@ const hasMatchingTag = (item: EventDTO | NodeDTO | null, tags: string[]): boolea
 sample({
   clock: $filterTags, // Триггерится при изменении фильтра тегов
   source: $eventGraph,
-  fn: (graph, tags) => {
-    if (tags.length === 0) return [];
-
-    const filterItems = (items: (NodeDTO | EventDTO | null)[]) =>
-      items.filter(item => item && !hasMatchingTag(item, tags));
+  filter: Boolean,
+  fn: (graph: EventGraphDTO, tags) => {
+    const filterItems = (items: (NodeDTO | EventDTO)[]) => items.filter(item => item && !hasMatchingTag(item, tags));
 
     // Фильтруем узлы и события, оставляя только те, у которых нет нужных тегов
     const nodesWithoutTag = filterItems(graph.nodes);

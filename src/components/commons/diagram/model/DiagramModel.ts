@@ -1,25 +1,30 @@
-import {Edge, EdgeChange, NodeChange, applyEdgeChanges, applyNodeChanges, type Node} from '@xyflow/react';
-import {createEvent, createStore, sample} from 'effector';
+import { applyEdgeChanges, applyNodeChanges, Edge, EdgeChange, NodeChange } from '@xyflow/react';
+import { createEvent, createStore, sample } from 'effector';
 
 import {
   $expandableItems,
   expandItemByTopicId,
   shrinkItemByTopicId,
 } from '@/components/commons/diagram/model/ExpandableItemsModel';
-import {adaptGhostNode, applyLayout} from '@/helpers/adapters';
-import {getRelatedGhostNodeId} from '@/helpers/diagram-helpers/edge-helpers';
-import {$eventGraph, clearEventGraph, removeLinks, removeNodes} from '@/models/EventGraphModel';
-import {TNode} from '@/types/common';
+import { adaptGhostNode, applyLayout } from '@/helpers/adapters';
+import { getRelatedGhostNodeId } from '@/helpers/diagram-helpers/edge-helpers';
+import { $eventGraph, clearEventGraph, removeLinks, removeNodes } from '@/models/EventGraphModel';
+import { TNode } from '@/types/common';
 
 // События для изменения состояния узлов и связей
 export const setNodes = createEvent<TNode[]>();
 export const setEdges = createEvent<Edge[]>();
-export const setGhostNodes = createEvent<Node[]>();
+export const setGhostNodes = createEvent<TNode[]>();
 
 export const clearNodes = createEvent();
 export const clearEdges = createEvent();
 export const clearGhostNodes = createEvent();
 export const removeGhostNode = createEvent<string>();
+export const removeGhostNodes = createEvent<string[]>();
+
+export const setRenamingNodeId = createEvent<string | null>();
+
+export const $renamingNodeId = createStore<string | null>(null).on(setRenamingNodeId, (_, payload) => payload);
 
 // События для обработки изменений узлов и связей
 export const onNodesChange = createEvent<NodeChange<TNode>[]>();
@@ -39,9 +44,10 @@ export const $nodes = createStore<TNode[]>([])
  * которые остаются в графе после удаления оригинальных узлов.
  * Используются для отображения связей, сохранившихся после удаления узлов.
  */
-export const $ghostNodes = createStore<Node[]>([])
+export const $ghostNodes = createStore<TNode[]>([])
   .on(setGhostNodes, (_, nodes) => nodes)
   .on(removeGhostNode, (nodes, id) => nodes.filter(node => node.id !== id))
+  .on(removeGhostNodes, (ghostNodes, payload) => ghostNodes.filter(({ id }) => !payload.includes(id)))
   .reset(clearGhostNodes);
 
 export const $edges = createStore<Edge[]>([])
@@ -71,13 +77,16 @@ $eventGraph.watch(async data => {
 // При удалении ноды, но сохранении связи записываем удаленные ноды в отдельный стор
 sample({
   clock: removeNodes,
-  source: $ghostNodes,
-  fn: (ghostNodes, deletingNodeIds) => {
-    const deletingNodes = $nodes.getState().filter(node => deletingNodeIds.includes(node.id));
+  source: {
+    nodes: $nodes,
+    ghostNodes: $ghostNodes,
+  },
+  fn: ({ ghostNodes, nodes }, deletingNodeIds) => {
+    const deletingNodes = nodes.filter(node => deletingNodeIds.includes(node.id));
 
     const adaptedNodes = deletingNodes.map(deletingNode => adaptGhostNode(deletingNode));
 
-    return [...ghostNodes, ...adaptedNodes];
+    return [...ghostNodes, ...adaptedNodes] as TNode[];
   },
   target: $ghostNodes,
 });
@@ -89,7 +98,7 @@ sample({
     ghostNodes: $ghostNodes,
     allEdges: $edges,
   },
-  fn: ({allEdges, ghostNodes}, deletingLinkIds) => {
+  fn: ({ allEdges, ghostNodes }, deletingLinkIds) => {
     // Получаем связи, которые удаляются
     const deletingEdges = allEdges.filter(edge => deletingLinkIds.includes(edge.id));
 

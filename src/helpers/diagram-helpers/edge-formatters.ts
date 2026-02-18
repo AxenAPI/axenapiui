@@ -1,8 +1,9 @@
-import {Edge} from '@xyflow/react';
+import { Edge } from '@xyflow/react';
 import stc from 'string-to-color';
 
-import {getLinkType} from '@/helpers/diagram-helpers/edge-helpers';
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO } from '@shared/openapi';
+
+import { getLinkType } from '@/helpers/diagram-helpers/edge-helpers';
 
 export function formatBaseLinks(rawData: EventGraphDTO): Edge[] {
   return (

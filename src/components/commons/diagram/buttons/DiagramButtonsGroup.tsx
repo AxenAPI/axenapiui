@@ -1,11 +1,11 @@
-import {Button, ButtonsGroup} from '@axenix/ui-kit';
+import { Button, ButtonsGroup } from '@axenix/ui-kit';
 import clsx from 'clsx';
-import {useUnit} from 'effector-react';
-import {FC} from 'react';
-import {ArrowGuide, CircleLetterH, FileCode, ServerCog, TopologyStar, Trash} from 'tabler-icons-react';
+import { useUnit } from 'effector-react';
+import { FC } from 'react';
+import { ArrowGuide, CircleLetterH, FileCode, ServerCog, TopologyStar, Trash } from 'tabler-icons-react';
 
-import {ImportFileButton} from '@/components/commons/diagram/buttons/ImportFileButton';
-import {$selectedItems} from '@/components/commons/diagram/model/SelectedItemsModel';
+import { ImportFileButton } from '@/components/commons/diagram/buttons/ImportFileButton';
+import { $selectedItems } from '@/components/commons/diagram/model/SelectedItemsModel';
 
 export type TDiagramGroupButtonsProps = {
   onAddService: () => void;
@@ -26,20 +26,20 @@ export const DiagramGroupButtons: FC<TDiagramGroupButtonsProps> = ({
   const selectedItems = useUnit($selectedItems);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       <ButtonsGroup
-        className="flex items-center gap-2"
+        className="flex items-center gap-1"
         buttonsConfig={[
           {
             buttonKey: 'firstButton',
             icon: <TopologyStar />,
-            children: 'Service',
             isBlock: false,
             isDisabled: false,
             isLoading: false,
             onClick: onAddService,
             style: {},
-            title: 'Service',
+            tooltip: 'Service',
+            placementTooltip: 'bottomLeft',
             shape: 'default',
             size: 'middle',
             type: 'default',
@@ -47,52 +47,52 @@ export const DiagramGroupButtons: FC<TDiagramGroupButtonsProps> = ({
           {
             buttonKey: 'secondButton',
             icon: <ServerCog />,
-            children: 'Topic',
             isBlock: false,
             isDisabled: false,
             isLoading: false,
             onClick: onAddTopic,
             style: {},
-            title: 'Topic',
+            tooltip: 'Topic',
+            placementTooltip: 'bottomLeft',
             size: 'middle',
             type: 'default',
           },
           {
             buttonKey: 'thirdButton',
             icon: <FileCode />,
-            children: 'Event',
             isBlock: false,
             isDisabled: false,
             isLoading: false,
             onClick: onAddEvent,
             style: {},
-            title: 'Event',
+            tooltip: 'Event',
+            placementTooltip: 'bottomLeft',
             size: 'middle',
             type: 'default',
           },
           {
             buttonKey: 'fourthButton',
             icon: <CircleLetterH />,
-            children: 'HTTP',
             isBlock: false,
             isDisabled: false,
             isLoading: false,
             onClick: onAddHttp,
             style: {},
-            title: 'HTTP',
+            tooltip: 'HTTP',
+            placementTooltip: 'bottomLeft',
             size: 'middle',
             type: 'default',
           },
           {
             buttonKey: 'fifthButton',
             icon: <ArrowGuide />,
-            children: 'Link',
             isBlock: false,
             isDisabled: false,
             isLoading: false,
             onClick: onAddLink,
             style: {},
-            title: 'Link',
+            tooltip: 'Link',
+            placementTooltip: 'bottomLeft',
             size: 'middle',
             type: 'default',
           },
@@ -110,12 +110,11 @@ export const DiagramGroupButtons: FC<TDiagramGroupButtonsProps> = ({
         onClick={onDelete}
         shape="default"
         size="middle"
-        title="Delete"
+        tooltip="Delete"
+        placementTooltip="bottomLeft"
         type="default"
         isGhost={false}
-      >
-        Delete
-      </Button>
+      />
     </div>
   );
 };

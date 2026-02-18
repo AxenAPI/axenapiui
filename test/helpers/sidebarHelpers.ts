@@ -1,4 +1,4 @@
-import {Locator, Page} from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 /**
  * Функция для получения элементов левой панели:
@@ -46,7 +46,7 @@ export async function getSidebarBlockState(sidebarBlock: Locator) {
   const items = sidebarBlock.locator('ul >> li');
   const itemsCount = await items.count();
 
-  return {items, itemsCount};
+  return { items, itemsCount };
 }
 
 /**
@@ -54,13 +54,13 @@ export async function getSidebarBlockState(sidebarBlock: Locator) {
  * @param page
  */
 export async function getSidebarState(page: Page) {
-  const {eventsBlock, httpBlock, serviceBlock, topicBlock, linksBlock} = await getSidebarMenuItems(page);
+  const { eventsBlock, httpBlock, linksBlock, serviceBlock, topicBlock } = await getSidebarMenuItems(page);
 
-  const {items: serviceItems, itemsCount: serviceItemsCount} = await getSidebarBlockState(serviceBlock);
-  const {items: topicItems, itemsCount: topicItemsCount} = await getSidebarBlockState(topicBlock);
-  const {items: eventItems, itemsCount: eventItemsCount} = await getSidebarBlockState(eventsBlock);
-  const {items: httpItems, itemsCount: httpItemsCount} = await getSidebarBlockState(httpBlock);
-  const {items: linkItems, itemsCount: linkItemsCount} = await getSidebarBlockState(linksBlock);
+  const { items: serviceItems, itemsCount: serviceItemsCount } = await getSidebarBlockState(serviceBlock);
+  const { items: topicItems, itemsCount: topicItemsCount } = await getSidebarBlockState(topicBlock);
+  const { items: eventItems, itemsCount: eventItemsCount } = await getSidebarBlockState(eventsBlock);
+  const { items: httpItems, itemsCount: httpItemsCount } = await getSidebarBlockState(httpBlock);
+  const { items: linkItems, itemsCount: linkItemsCount } = await getSidebarBlockState(linksBlock);
 
   return {
     serviceItems,

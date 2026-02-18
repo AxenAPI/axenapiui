@@ -1,4 +1,4 @@
-import {EventGraphDTO} from '@/shared/api/event-graph-api';
+import { EventGraphDTO } from '@shared/openapi';
 
 export const EventGraph1: EventGraphDTO = {
   name: 'consume_one_event_service',
@@ -9,7 +9,7 @@ export const EventGraph1: EventGraphDTO = {
       belongsToGraph: ['a1b2c3d4-e5f6-7890-1234-567890abcdef'],
       name: 'consume_one_event_service',
       type: 'SERVICE',
-      brokerType: null,
+      brokerType: undefined,
     },
     {
       id: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
@@ -21,6 +21,7 @@ export const EventGraph1: EventGraphDTO = {
   ],
   links: [
     {
+      id: 'l1',
       toId: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
       fromId: 'b2c3d4e5-f678-9012-3456-7890abcdef01',
       eventId: 'c3d4e5f6-7890-1234-5678-90abcdef0123',
